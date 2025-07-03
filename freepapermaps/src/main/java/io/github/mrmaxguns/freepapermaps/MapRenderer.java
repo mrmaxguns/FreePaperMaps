@@ -7,7 +7,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
-import java.awt.Rectangle;
+
 import java.awt.Color;
 import java.awt.geom.Path2D;
 import java.io.Writer;
@@ -60,16 +60,16 @@ public class MapRenderer {
         Projection proj = new PseudoMercatorProjection(-14.3106660, 22.5659960);
         Path2D polygon = new Path2D.Double();
 
-        Coordinate c1 = proj.project(Coordinate.createWGS84(-14.3106481, 22.5659566));
+        Coordinate c1 = proj.project(Coordinate.newWGS84Coordinate(-14.3106481, 22.5659566));
         polygon.moveTo(c1.getX() * 10, c1.getY() * 10);
 
-        Coordinate c2 = proj.project(Coordinate.createWGS84(-14.3105952, 22.5658847));
+        Coordinate c2 = proj.project(Coordinate.newWGS84Coordinate(-14.3105952, 22.5658847));
         polygon.lineTo(c2.getX() * 10, c2.getY() * 10);
 
-        Coordinate c3 = proj.project(Coordinate.createWGS84(-14.3105630, 22.5659048));
+        Coordinate c3 = proj.project(Coordinate.newWGS84Coordinate(-14.3105630, 22.5659048));
         polygon.lineTo(c3.getX() * 10, c3.getY() * 10);
 
-        Coordinate c4 = proj.project(Coordinate.createWGS84(-14.3106159, 22.5659768));
+        Coordinate c4 = proj.project(Coordinate.newWGS84Coordinate(-14.3106159, 22.5659768));
         polygon.lineTo(c4.getX() * 10, c4.getY() * 10);
 
         polygon.closePath();
