@@ -8,13 +8,14 @@ import org.apache.batik.svggen.SVGGraphics2DIOException;
 
 public class App {
     public static void main(String[] args) throws ParserConfigurationException, UnsupportedEncodingException, SVGGraphics2DIOException {
-        if (args.length != 1) {
-            System.err.println("Expected exactly one argument: the name of the OSM file to read.");
-            System.exit(1);
-        }
+//        if (args.length != 1) {
+//            System.err.println("Expected exactly one argument: the name of the OSM file to read.");
+//            System.exit(1);
+//        }
 
         try {
-            createMap(args[0]);
+            // createMap(args[0]);
+            createMap("/home/maxim/downloads/map.osm");
         } catch (UserInputException e) {
             System.err.println(e.getMessage());
             System.exit(1);
