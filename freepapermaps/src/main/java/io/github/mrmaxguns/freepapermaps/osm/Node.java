@@ -1,11 +1,15 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
+import org.w3c.dom.NodeList;
 
-public class Node extends Element {
+import java.util.List;
+
+public class Node {
     private long id;
     private Coordinate position;
     private boolean visible;
+    private final TagList tags;
 
     public Node(long id, Coordinate position, boolean visible) {
         this.id = id;
@@ -16,6 +20,7 @@ public class Node extends Element {
         this.position = position;
 
         this.visible = visible;
+        this.tags = new TagList();
     }
 
     public static Node fromXML(org.w3c.dom.Node rawNode) {
@@ -27,7 +32,12 @@ public class Node extends Element {
 
         boolean visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
 
-        return new Node(id, position, visible);
+        Node newNode = new Node(id, position, visible);
+
+        NodeList tags = rawNode.getChildNodes();
+        newNode.getTags().insertFromXML(tags);
+
+        return newNode;
     }
 
     public long getId() {
@@ -52,5 +62,9 @@ public class Node extends Element {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public TagList getTags() {
+        return tags;
     }
 }
