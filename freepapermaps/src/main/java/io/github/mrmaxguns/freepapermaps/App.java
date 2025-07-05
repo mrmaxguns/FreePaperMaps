@@ -1,6 +1,9 @@
 package io.github.mrmaxguns.freepapermaps;
 
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
+import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
+import io.github.mrmaxguns.freepapermaps.projections.Projection;
+import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Document;
@@ -77,7 +80,8 @@ public class App {
         OSM mapData = OSM.fromXML(doc);
 
         // Render the map
-        MapRenderer renderer = new MapRenderer();
-        renderer.renderToStream(mapData, outputFile);
+        Projection projection = new PseudoMercatorProjection(Coordinate.newWGS84Coordinate(mapData.getMinLon(), mapData.getMaxLat()));
+        MapRenderer renderer = new MapRenderer(mapData, projection);
+        renderer.renderToStream(outputFile);
     }
 }
