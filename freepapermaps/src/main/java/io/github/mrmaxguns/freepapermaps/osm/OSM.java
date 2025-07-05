@@ -15,6 +15,7 @@ public class OSM {
     private double maxLon;
 
     private final ArrayList<Node> nodes;
+    private final ArrayList<Way> ways;
 
     public OSM(double minLat, double minLon, double maxLat, double maxLon) {
         this.minLat = minLat;
@@ -23,6 +24,7 @@ public class OSM {
         this.maxLon = maxLon;
 
         this.nodes = new ArrayList<>();
+        this.ways = new ArrayList<>();
     }
 
     public static OSM fromXML(Document doc) {
@@ -41,7 +43,13 @@ public class OSM {
         // Get all nodes
         NodeList rawNodes = doc.getElementsByTagName("node");
         for (int i = 0; i < rawNodes.getLength(); ++i) {
-            newOSM.addNode(Node.fromXML(rawNodes.item(i)));
+            newOSM.getNodes().add(Node.fromXML(rawNodes.item(i)));
+        }
+
+        // Get all ways
+        NodeList rawWays = doc.getElementsByTagName("way");
+        for (int i = 0; i < rawWays.getLength(); ++i) {
+            newOSM.getWays().add(Way.fromXML(rawWays.item(i)));
         }
 
         return newOSM;
@@ -80,11 +88,7 @@ public class OSM {
     }
 
     public List<Node> getNodes() {
-        return Collections.unmodifiableList(nodes);
-    }
-
-    public void addNode(Node n) {
-        this.nodes.add(n);
+        return nodes;
     }
 
     public Node getNodeById(long id) {
@@ -93,5 +97,9 @@ public class OSM {
 
     public void removeNodeById(long id) {
         nodes.removeIf(n -> n.getId() == id);
+    }
+
+    public List<Way> getWays() {
+        return ways;
     }
 }
