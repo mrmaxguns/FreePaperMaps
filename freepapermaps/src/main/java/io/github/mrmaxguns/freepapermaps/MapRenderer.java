@@ -11,26 +11,22 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
 
 import java.awt.Color;
-import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.batik.svggen.SVGGraphics2DIOException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
 
 
 public class MapRenderer {
-    public void renderToFile(OSM mapData, String filename) throws UnsupportedEncodingException, SVGGraphics2DIOException, UserInputException {
+    public void renderToStream(OSM mapData, OutputStream outputFile) throws SVGGraphics2DIOException {
         // Set up the SVG and canvas on which to draw the map
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         String svgNS = "http://www.w3.org/2000/svg";
         Document document = domImpl.createDocument(svgNS, "svg", null);
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
 
-        // TEST
+        // Simple test render: draw all nodes as red squares
         svgGenerator.setPaint(Color.red);
 
         Projection proj = new PseudoMercatorProjection(Coordinate.newWGS84Coordinate(mapData.getMinLon(), mapData.getMaxLat()));
@@ -43,13 +39,7 @@ public class MapRenderer {
         // Stream the SVG to a file
         boolean useCSS = true;
        
-        Writer out;
-        try {
-            out = new OutputStreamWriter(new FileOutputStream(new File(filename)), "UTF-8");
-        } catch (FileNotFoundException e) {
-            throw new UserInputException("Could not write to file '" + filename + "'");
-        }
+        Writer out = new OutputStreamWriter(outputFile, StandardCharsets.UTF_8);
         svgGenerator.stream(out, useCSS);
     }
 }
-
