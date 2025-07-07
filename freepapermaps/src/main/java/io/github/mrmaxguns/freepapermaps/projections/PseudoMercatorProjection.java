@@ -23,7 +23,7 @@ public class PseudoMercatorProjection extends Projection {
 
     /** Most positive longitude value. */
     public static final double MAX_LON = 180;
-    /** Most negative longitude value. Not exactly 90 degrees for the same reason as before. */
+    /** Most negative longitude value. Not exactly 90 degrees for the same reason as <code>MAX_LAT</code>. */
     public static final double MIN_LAT = -85.05113;
 
     /** The origin value that was passed into this projection, converted into x/y units by the Mercator formula. */
@@ -63,7 +63,7 @@ public class PseudoMercatorProjection extends Projection {
     }
 
     /**
-     * Projects a WGS84 coordinate to our InternalMeters coordinate system with the help of the Mercator projection.
+     * Projects a WGS84 Coordinate to our Projected Coordinate system with the help of the Mercator projection.
      *
      * @param original the original WGS84 coordinate
      * @return an InternalMeters coordinate after applying a mercator projection to original

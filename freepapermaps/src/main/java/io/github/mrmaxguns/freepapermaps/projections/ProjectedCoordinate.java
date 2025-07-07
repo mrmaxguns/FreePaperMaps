@@ -1,5 +1,16 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+/**
+ * ProjectedCoordinate represents an internally used coordinate system similar to the one used in computer graphics:
+ * <ul>
+ *     <li>The origin is located at (0, 0) and is in the top left corner of the map</li>
+ *     <li>
+ *         Point values are x and y distances in meters. Distances are only positive and represent distance to
+ *         the right (x) or down (y)
+ *     </li>
+ *     <li>A ProjectedCoordinate is typically the result of applying a Projection to a WGS84 Coordinate</li>
+ * </ul>
+ */
 public class ProjectedCoordinate extends Coordinate<ProjectedCoordinate> {
     public ProjectedCoordinate(double x, double y) {
         super(x, y);

@@ -1,5 +1,9 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+/**
+ * Represents a coordinate that requires further processing. Since the meaning of this coordinate is ambiguous on
+ * purpose, it should not be used in public interfaces.
+ */
 public class RawCoordinate extends Coordinate<RawCoordinate> {
     public RawCoordinate(double xOrLon, double yOrLat) {
         super(xOrLon, yOrLat);
