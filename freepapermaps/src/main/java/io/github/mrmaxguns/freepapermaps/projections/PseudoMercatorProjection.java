@@ -24,7 +24,7 @@ public class PseudoMercatorProjection extends Projection {
     /** Most positive longitude value. */
     public static final double MAX_LON = 180;
     /** Most negative longitude value. Not exactly 90 degrees for the same reason as before. */
-    public static final double MIN_LAT = 85.05113;
+    public static final double MIN_LAT = -85.05113;
 
     /** The origin value that was passed into this projection, converted into x/y units by the Mercator formula. */
     private final Coordinate localOrigin;
@@ -39,8 +39,10 @@ public class PseudoMercatorProjection extends Projection {
     /** Constructs a Pseudo-Mercator Projection given a point of origin (WGS84). */
     public PseudoMercatorProjection(Coordinate origin) {
         super(origin);
+        checkBounds(origin);
 
         localOrigin = projectRaw(this.origin);
+        // TODO: Replace globalOrigin and globalOriginDiag with a single BoundingBox type with precalculated width/height.
         globalOrigin = projectRaw(Coordinate.newWGS84Coordinate(MIN_LON, MAX_LAT));
         globalOriginDiag = projectRaw(Coordinate.newWGS84Coordinate(MAX_LON, MIN_LAT));
     }
@@ -53,15 +55,13 @@ public class PseudoMercatorProjection extends Projection {
      * @return the output of applying the mercator projection, in meters (a Raw coordinate)
      */
     public Coordinate projectRaw(Coordinate original) {
-        if (original.getCategory() != Coordinate.Category.WGS84) {
-            throw new IllegalArgumentException("Parameter 'original' must be a WGS84 coordinate.");
-        }
+        checkBounds(original);
 
         double lon = original.getX();
         double lat = original.getY();
 
-        double xRaw = Math.log(Math.tan(Math.PI / 4 + Math.toRadians(lon) / 2)) * RADIUS;
-        double yRaw = Math.toRadians(lat) * RADIUS;
+        double xRaw = Math.toRadians(lon) * RADIUS;
+        double yRaw = Math.log(Math.tan(Math.PI / 4 + Math.toRadians(lat) / 2)) * RADIUS;
 
         return Coordinate.newRawCoordinate(xRaw, yRaw);
     }
@@ -78,12 +78,12 @@ public class PseudoMercatorProjection extends Projection {
 
         // Account for a point to the left of our origin point, by wrapping it around to the right.
         if (xRaw < localOrigin.getX()) {
-            xRaw = localOrigin.getX() + (xRaw - globalOrigin.getX());
+            xRaw = xRaw + (globalOriginDiag.getX() - globalOrigin.getX());
         }
 
-        // Account for a point above our origin point, by wrapping it around to be below.
+        // Y-wraparound is not supported because it causes issues, especially due to our cutoff at 85 degrees.
         if (yRaw > localOrigin.getY()) {
-            yRaw = localOrigin.getY() - (globalOrigin.getY() - yRaw);
+            throw new IllegalArgumentException("Wrapping around across latitude is not supported.");
         }
 
         // Shift the coordinate so that it is correct relative to our origin point, which is (0, 0) in our new coordinate
@@ -94,5 +94,16 @@ public class PseudoMercatorProjection extends Projection {
 
     public String getName() {
         return "Pseudo-Mercator Projection";
+    }
+
+    /** Throws an exception if a point is not an appropriate input for this projection. */
+    private void checkBounds(Coordinate c) {
+        if (c.getCategory() != Coordinate.Category.WGS84) {
+            throw new IllegalArgumentException("WGS84 coordinate required.");
+        }
+
+        if (c.getLon() < MIN_LON || c.getLon() > MAX_LON || c.getLat() < MIN_LAT || c.getLat() > MAX_LAT) {
+            throw new IllegalArgumentException("Coordinate " + c + " is outside the bounds of what can be projected by the Mercator.");
+        }
     }
 }

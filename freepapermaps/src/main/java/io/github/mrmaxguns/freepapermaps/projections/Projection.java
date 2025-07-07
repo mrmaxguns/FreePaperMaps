@@ -19,6 +19,11 @@ public abstract class Projection {
     /** Gets the projection's human-readable name. */
     public abstract String getName();
 
+    /** Returns the projection's origin. */
+    public Coordinate getOrigin() {
+        return origin;
+    }
+
     /** Converts a WGS84 coordinate to an InternalMeters coordinate based on the current projection. */
     public abstract Coordinate project(Coordinate original);
 }

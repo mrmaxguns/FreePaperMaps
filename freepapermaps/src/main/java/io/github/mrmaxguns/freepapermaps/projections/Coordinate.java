@@ -148,6 +148,19 @@ public class Coordinate {
         return new Coordinate(x - other.x, y - other.y, category);
     }
 
+    /**
+     * Returns a new coordinate whose values are multiplied by some scale factor.
+     * @param scaleFactor the value by which x/y or lat/lon ar multiplied by
+     */
+    public Coordinate scale(double scaleFactor) {
+        return new Coordinate(x * scaleFactor, y * scaleFactor, category);
+    }
+
+    /** Should be used to compare coordinates instead of the == operator. */
+    public boolean equals(Coordinate other) {
+        return (category == other.getCategory()) && (x == other.getX()) && (y == other.getY());
+    }
+
     /** Returns a string representation of this coordinate. */
     public String toString() {
         String prefix;
