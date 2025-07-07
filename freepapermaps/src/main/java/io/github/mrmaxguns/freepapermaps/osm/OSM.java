@@ -1,5 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
+import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
+import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
@@ -9,20 +11,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class OSM {
-    private double minLat;
-    private double minLon;
-    private double maxLat;
-    private double maxLon;
+    private BoundingBox<WGS84Coordinate> boundingBox;
 
     private final ArrayList<Node> nodes;
     private final ArrayList<Way> ways;
 
-    public OSM(double minLat, double minLon, double maxLat, double maxLon) {
-        this.minLat = minLat;
-        this.minLon = minLon;
-        this.maxLat = maxLat;
-        this.maxLon = maxLon;
-
+    public OSM(BoundingBox<WGS84Coordinate> boundingBox) {
+        this.boundingBox = boundingBox;
         this.nodes = new ArrayList<>();
         this.ways = new ArrayList<>();
     }
@@ -38,7 +33,10 @@ public class OSM {
         double maxLon = Double.parseDouble(bounds.getNamedItem("maxlon").getNodeValue());
 
         // Create the OSM object
-        OSM newOSM = new OSM(minLat, minLon, maxLat, maxLon);
+        OSM newOSM = new OSM(new BoundingBox<>(
+                new WGS84Coordinate(minLon, maxLat),
+                new WGS84Coordinate(maxLon, minLat)
+        ));
 
         // Get all nodes
         NodeList rawNodes = doc.getElementsByTagName("node");
@@ -55,38 +53,6 @@ public class OSM {
         return newOSM;
     }
 
-    public double getMinLat() {
-        return minLat;
-    }
-
-    public void setMinLat(double minLat) {
-        this.minLat = minLat;
-    }
-
-    public double getMinLon() {
-        return minLon;
-    }
-
-    public void setMinLon(double minLon) {
-        this.minLon = minLon;
-    }
-
-    public double getMaxLat() {
-        return maxLat;
-    }
-
-    public void setMaxLat(double maxLat) {
-        this.maxLat = maxLat;
-    }
-
-    public double getMaxLon() {
-        return maxLon;
-    }
-
-    public void setMaxLon(double maxLon) {
-        this.maxLon = maxLon;
-    }
-
     public List<Node> getNodes() {
         return nodes;
     }
@@ -101,5 +67,13 @@ public class OSM {
 
     public List<Way> getWays() {
         return ways;
+    }
+
+    public BoundingBox<WGS84Coordinate> getBoundingBox() {
+        return boundingBox;
+    }
+
+    public void setBoundingBox(BoundingBox<WGS84Coordinate> boundingBox) {
+        this.boundingBox = boundingBox;
     }
 }

@@ -28,13 +28,9 @@ public class PseudoMercatorProjection extends Projection {
 
     /** The origin value that was passed into this projection, converted into x/y units by the Mercator formula. */
     private final RawCoordinate localOrigin;
-    /** The "global origin" converted into x/y units by the Mercator formula. This is the top-left corner of a world map. */
-    private final RawCoordinate globalOrigin;
-    /**
-     * The diagonal to the "global origin" converted into x/y units by the Mercator formula. This is the bottom-right corner
-     * of the world map.
-     */
-    private final RawCoordinate globalOriginDiag;
+
+    /** Bounding box of the world map, as outputted by the Mercator projection. */
+    private final BoundingBox<RawCoordinate> globalBoundingBox;
 
     /** Constructs a Pseudo-Mercator Projection given a point of origin (WGS84). */
     public PseudoMercatorProjection(WGS84Coordinate origin) {
@@ -42,9 +38,9 @@ public class PseudoMercatorProjection extends Projection {
         checkBounds(origin);
 
         localOrigin = projectRaw(this.origin);
-        // TODO: Replace globalOrigin and globalOriginDiag with a single BoundingBox type with precalculated width/height.
-        globalOrigin = projectRaw(new WGS84Coordinate(MIN_LON, MAX_LAT));
-        globalOriginDiag = projectRaw(new WGS84Coordinate(MAX_LON, MIN_LAT));
+        globalBoundingBox = new BoundingBox<>(
+                projectRaw(new WGS84Coordinate(MIN_LON, MAX_LAT)),
+                projectRaw(new WGS84Coordinate(MAX_LON, MIN_LAT)));
     }
 
     /**
@@ -79,7 +75,7 @@ public class PseudoMercatorProjection extends Projection {
 
         // Account for a point to the left of our origin point, by wrapping it around to the right.
         if (xRaw < localOrigin.getX()) {
-            xRaw = xRaw + (globalOriginDiag.getX() - globalOrigin.getX());
+            xRaw = xRaw + globalBoundingBox.getWidth();
         }
 
         // Y-wraparound is not supported because it causes issues, especially due to our cutoff at 85 degrees.
