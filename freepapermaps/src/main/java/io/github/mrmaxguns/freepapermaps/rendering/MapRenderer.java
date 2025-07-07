@@ -1,12 +1,9 @@
-package io.github.mrmaxguns.freepapermaps;
+package io.github.mrmaxguns.freepapermaps.rendering;
 
-import io.github.mrmaxguns.freepapermaps.osm.Node;
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.osm.Way;
-import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
 import io.github.mrmaxguns.freepapermaps.projections.ProjectedCoordinate;
 import io.github.mrmaxguns.freepapermaps.projections.Projection;
-import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
@@ -14,7 +11,6 @@ import org.w3c.dom.DOMImplementation;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;

@@ -1,10 +1,10 @@
 package io.github.mrmaxguns.freepapermaps;
 
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
-import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
 import io.github.mrmaxguns.freepapermaps.projections.Projection;
 import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
+import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Document;
