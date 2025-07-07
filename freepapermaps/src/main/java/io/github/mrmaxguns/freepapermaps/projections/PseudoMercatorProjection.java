@@ -27,24 +27,24 @@ public class PseudoMercatorProjection extends Projection {
     public static final double MIN_LAT = -85.05113;
 
     /** The origin value that was passed into this projection, converted into x/y units by the Mercator formula. */
-    private final Coordinate localOrigin;
+    private final RawCoordinate localOrigin;
     /** The "global origin" converted into x/y units by the Mercator formula. This is the top-left corner of a world map. */
-    private final Coordinate globalOrigin;
+    private final RawCoordinate globalOrigin;
     /**
      * The diagonal to the "global origin" converted into x/y units by the Mercator formula. This is the bottom-right corner
      * of the world map.
      */
-    private final Coordinate globalOriginDiag;
+    private final RawCoordinate globalOriginDiag;
 
     /** Constructs a Pseudo-Mercator Projection given a point of origin (WGS84). */
-    public PseudoMercatorProjection(Coordinate origin) {
+    public PseudoMercatorProjection(WGS84Coordinate origin) {
         super(origin);
         checkBounds(origin);
 
         localOrigin = projectRaw(this.origin);
         // TODO: Replace globalOrigin and globalOriginDiag with a single BoundingBox type with precalculated width/height.
-        globalOrigin = projectRaw(Coordinate.newWGS84Coordinate(MIN_LON, MAX_LAT));
-        globalOriginDiag = projectRaw(Coordinate.newWGS84Coordinate(MAX_LON, MIN_LAT));
+        globalOrigin = projectRaw(new WGS84Coordinate(MIN_LON, MAX_LAT));
+        globalOriginDiag = projectRaw(new WGS84Coordinate(MAX_LON, MIN_LAT));
     }
 
     /**
@@ -54,7 +54,7 @@ public class PseudoMercatorProjection extends Projection {
      * @param original the original WGS84 coordinate.
      * @return the output of applying the mercator projection, in meters (a Raw coordinate)
      */
-    public Coordinate projectRaw(Coordinate original) {
+    public RawCoordinate projectRaw(WGS84Coordinate original) {
         checkBounds(original);
 
         double lon = original.getX();
@@ -63,16 +63,17 @@ public class PseudoMercatorProjection extends Projection {
         double xRaw = Math.toRadians(lon) * RADIUS;
         double yRaw = Math.log(Math.tan(Math.PI / 4 + Math.toRadians(lat) / 2)) * RADIUS;
 
-        return Coordinate.newRawCoordinate(xRaw, yRaw);
+        return new RawCoordinate(xRaw, yRaw);
     }
 
     /**
      * Projects a WGS84 coordinate to our InternalMeters coordinate system with the help of the Mercator projection.
+     *
      * @param original the original WGS84 coordinate
      * @return an InternalMeters coordinate after applying a mercator projection to original
      */
-    public Coordinate project(Coordinate original) {
-        Coordinate projected = projectRaw(original);
+    public ProjectedCoordinate project(WGS84Coordinate original) {
+        RawCoordinate projected = projectRaw(original);
         double xRaw = projected.getX();
         double yRaw = projected.getY();
 
@@ -89,7 +90,7 @@ public class PseudoMercatorProjection extends Projection {
         // Shift the coordinate so that it is correct relative to our origin point, which is (0, 0) in our new coordinate
         // system. We need to take the absolute value of y because despite the fact that our origin is technically
         // at the top, we count up going down as is standard in the computer graphics world.
-        return Coordinate.newInternalCoordinate(xRaw - localOrigin.getX(), Math.abs(yRaw - localOrigin.getY()));
+        return new ProjectedCoordinate(xRaw - localOrigin.getX(), Math.abs(yRaw - localOrigin.getY()));
     }
 
     public String getName() {
@@ -97,11 +98,7 @@ public class PseudoMercatorProjection extends Projection {
     }
 
     /** Throws an exception if a point is not an appropriate input for this projection. */
-    private void checkBounds(Coordinate c) {
-        if (c.getCategory() != Coordinate.Category.WGS84) {
-            throw new IllegalArgumentException("WGS84 coordinate required.");
-        }
-
+    private void checkBounds(WGS84Coordinate c) {
         if (c.getLon() < MIN_LON || c.getLon() > MAX_LON || c.getLat() < MIN_LAT || c.getLat() > MAX_LAT) {
             throw new IllegalArgumentException("Coordinate " + c + " is outside the bounds of what can be projected by the Mercator.");
         }

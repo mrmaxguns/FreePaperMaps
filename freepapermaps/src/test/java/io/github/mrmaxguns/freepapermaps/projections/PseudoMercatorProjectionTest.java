@@ -5,25 +5,19 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PseudoMercatorProjectionTest {
-    private PseudoMercatorProjection defaultProjection = new PseudoMercatorProjection(Coordinate.newWGS84Coordinate(0, 0));
+    private final PseudoMercatorProjection defaultProjection = new PseudoMercatorProjection(new WGS84Coordinate(0, 0));
 
     @Test
     public void testConstructor() {
-        Coordinate c = Coordinate.newWGS84Coordinate(10, 20);
+        WGS84Coordinate c = new WGS84Coordinate(10, 20);
         PseudoMercatorProjection p = new PseudoMercatorProjection(c);
         assertTrue(p.getOrigin().equals(c));
     }
 
     @Test
-    public void testConstructorWrongCategory() {
-        Coordinate c = Coordinate.newSVGCoordinate(500, 200);
-        assertThrows(IllegalArgumentException.class, () -> new PseudoMercatorProjection((c)));
-    }
-
-    @Test
     public void testProjectRaw1() {
-        Coordinate c = Coordinate.newWGS84Coordinate(48.307, 54.310);
-        Coordinate result = defaultProjection.projectRaw(c);
+        WGS84Coordinate c = new WGS84Coordinate(48.307, 54.310);
+        RawCoordinate result = defaultProjection.projectRaw(c);
         assertAll(
                 () -> assertEquals(5377511, result.getX(), 1),
                 () -> assertEquals(7229087, result.getY(), 1)
@@ -32,8 +26,8 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectRaw2() {
-        Coordinate c = Coordinate.newWGS84Coordinate(0, 0);
-        Coordinate result = defaultProjection.projectRaw(c);
+        WGS84Coordinate c = new WGS84Coordinate(0, 0);
+        RawCoordinate result = defaultProjection.projectRaw(c);
         assertAll(
                 () -> assertEquals(0, result.getX(), 1),
                 () -> assertEquals(0, result.getY(), 1)
@@ -42,8 +36,8 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectRaw3() {
-        Coordinate c = Coordinate.newWGS84Coordinate(-66.18430, -47.80841);
-        Coordinate result = defaultProjection.projectRaw(c);
+        WGS84Coordinate c = new WGS84Coordinate(-66.18430, -47.80841);
+        RawCoordinate result = defaultProjection.projectRaw(c);
         assertAll(
                 () -> assertEquals(-7367603, result.getX(), 1),
                 () -> assertEquals(-6075040, result.getY(), 1)
@@ -51,15 +45,9 @@ public class PseudoMercatorProjectionTest {
     }
 
     @Test
-    public void testProjectRawWrongCategory() {
-        Coordinate c = Coordinate.newRawCoordinate(5.5, -5.3);
-        assertThrows(IllegalArgumentException.class, () -> defaultProjection.projectRaw(c));
-    }
-
-    @Test
     public void testProjectRawOutOfBoundsLon() {
-        Coordinate a = Coordinate.newWGS84Coordinate(-200, 30.4);
-        Coordinate b = Coordinate.newWGS84Coordinate(181.22, -14.8);
+        WGS84Coordinate a = new WGS84Coordinate(-200, 30.4);
+        WGS84Coordinate b = new WGS84Coordinate(181.22, -14.8);
         assertAll(
                 () -> assertThrows(IllegalArgumentException.class, () -> defaultProjection.projectRaw(a)),
                 () -> assertThrows(IllegalArgumentException.class, () -> defaultProjection.projectRaw(b))
@@ -68,8 +56,8 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectRawOutOfBoundsLat() {
-        Coordinate a = Coordinate.newWGS84Coordinate(30, -90);
-        Coordinate b = Coordinate.newWGS84Coordinate(40.5, 108.4);
+        WGS84Coordinate a = new WGS84Coordinate(30, -90);
+        WGS84Coordinate b = new WGS84Coordinate(40.5, 108.4);
         assertAll(
                 () -> assertThrows(IllegalArgumentException.class, () -> defaultProjection.projectRaw(a)),
                 () -> assertThrows(IllegalArgumentException.class, () -> defaultProjection.projectRaw(b))
@@ -78,9 +66,9 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectWithOrigin() {
-        Coordinate origin = Coordinate.newWGS84Coordinate(137.71654, -32.50831);
+        WGS84Coordinate origin = new WGS84Coordinate(137.71654, -32.50831);
         PseudoMercatorProjection p = new PseudoMercatorProjection(origin);
-        Coordinate result = p.project(origin);
+        ProjectedCoordinate result = p.project(origin);
 
         assertAll(
                 () -> assertEquals(0, result.getX(), 0.0001),
@@ -90,10 +78,10 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectWithNoWrapAround() {
-        Coordinate origin = Coordinate.newWGS84Coordinate(-28.32649, 38.52594);
+        WGS84Coordinate origin = new WGS84Coordinate(-28.32649, 38.52594);
         PseudoMercatorProjection p = new PseudoMercatorProjection(origin);
-        Coordinate test = Coordinate.newWGS84Coordinate(-28.30353, 38.51352);
-        Coordinate result = p.project(test);
+        WGS84Coordinate test = new WGS84Coordinate(-28.30353, 38.51352);
+        ProjectedCoordinate result = p.project(test);
 
         assertAll(
                 () -> assertEquals(2555, result.getX(), 1),
@@ -103,10 +91,10 @@ public class PseudoMercatorProjectionTest {
 
     @Test
     public void testProjectWithXWrapAround() {
-        Coordinate origin = Coordinate.newWGS84Coordinate(179.8, 51.516);
+        WGS84Coordinate origin = new WGS84Coordinate(179.8, 51.516);
         PseudoMercatorProjection p = new PseudoMercatorProjection(origin);
-        Coordinate test = Coordinate.newWGS84Coordinate(-179.9, 51.50);
-        Coordinate result = p.project(test);
+        WGS84Coordinate test = new WGS84Coordinate(-179.9, 51.50);
+        ProjectedCoordinate result = p.project(test);
 
         assertAll(
                 () -> assertEquals(33396, result.getX(), 1),

@@ -4,6 +4,7 @@ import io.github.mrmaxguns.freepapermaps.osm.Node;
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.osm.Way;
 import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
+import io.github.mrmaxguns.freepapermaps.projections.ProjectedCoordinate;
 import io.github.mrmaxguns.freepapermaps.projections.Projection;
 import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
 import org.apache.batik.svggen.SVGGraphics2D;
@@ -55,7 +56,7 @@ public class MapRenderer {
             g2d.setColor(new Color(rd.nextFloat(), rd.nextFloat(), rd.nextFloat()));
             GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, way.getNodeIds().size());
             for (int i = 0; i < way.getNodeIds().size(); ++i) {
-                Coordinate position = projection.project(mapData.getNodeById(way.getNodeIds().get(i)).getPosition());
+                ProjectedCoordinate position = projection.project(mapData.getNodeById(way.getNodeIds().get(i)).getPosition());
                 if (i == 0) {
                     polyline.moveTo(position.getX(), position.getY());
                 } else {

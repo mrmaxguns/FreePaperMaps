@@ -1,22 +1,17 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
-import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
+import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.NodeList;
 
-import java.util.List;
 
 public class Node {
     private long id;
-    private Coordinate position;
+    private WGS84Coordinate position;
     private boolean visible;
     private final TagList tags;
 
-    public Node(long id, Coordinate position, boolean visible) {
+    public Node(long id, WGS84Coordinate position, boolean visible) {
         this.id = id;
-
-        if (position.getCategory() != Coordinate.Category.WGS84) {
-            throw new IllegalArgumentException("Node coordinates must be WGS84.");
-        }
         this.position = position;
 
         this.visible = visible;
@@ -28,7 +23,7 @@ public class Node {
 
         double lon = Double.parseDouble(rawNode.getAttributes().getNamedItem("lon").getNodeValue());
         double lat = Double.parseDouble(rawNode.getAttributes().getNamedItem("lat").getNodeValue());
-        Coordinate position = Coordinate.newWGS84Coordinate(lon, lat);
+        WGS84Coordinate position = new WGS84Coordinate(lon, lat);
 
         boolean visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
 
@@ -48,11 +43,11 @@ public class Node {
         this.id = id;
     }
 
-    public Coordinate getPosition() {
+    public WGS84Coordinate getPosition() {
         return position;
     }
 
-    public void setPosition(Coordinate position) {
+    public void setPosition(WGS84Coordinate position) {
         this.position = position;
     }
 

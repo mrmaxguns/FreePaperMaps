@@ -6,13 +6,10 @@ package io.github.mrmaxguns.freepapermaps.projections;
  */
 public abstract class Projection {
     /** The WGS84 coordinate which will be taken to be the top left corner of the map. */
-    protected final Coordinate origin;
+    protected final WGS84Coordinate origin;
 
     /** Constructs a Projection given a point of origin (WGS84). */
-    public Projection(Coordinate origin) {
-        if (origin.getCategory() != Coordinate.Category.WGS84) {
-            throw new IllegalArgumentException("The origin of a projection must be specified as a WGS84 coordinate.");
-        }
+    public Projection(WGS84Coordinate origin) {
         this.origin = origin;
     }
 
@@ -20,10 +17,12 @@ public abstract class Projection {
     public abstract String getName();
 
     /** Returns the projection's origin. */
-    public Coordinate getOrigin() {
+    public WGS84Coordinate getOrigin() {
         return origin;
     }
 
-    /** Converts a WGS84 coordinate to an InternalMeters coordinate based on the current projection. */
-    public abstract Coordinate project(Coordinate original);
+    /**
+     * Converts a WGS84 coordinate to an InternalMeters coordinate based on the current projection.
+     */
+    public abstract ProjectedCoordinate project(WGS84Coordinate original);
 }
