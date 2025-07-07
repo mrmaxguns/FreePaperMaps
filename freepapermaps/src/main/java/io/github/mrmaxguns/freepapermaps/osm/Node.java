@@ -1,31 +1,54 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
+import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.NodeList;
 
+import java.util.Objects;
 
+
+/** Represents an OSM node, which is a point in space that optionally has tags. */
 public class Node {
+    /** The Node's unique identifier in the database. */
     private long id;
+    /** The Node's position in the world. Never null. */
     private WGS84Coordinate position;
+    /** Whether the Node should be rendered. */
     private boolean visible;
+    /** A list of tags associated with this Node. */
     private final TagList tags;
 
+    /** Constructs a new Node. */
     public Node(long id, WGS84Coordinate position, boolean visible) {
         this.id = id;
-        this.position = position;
-
+        this.position = Objects.requireNonNull(position);
         this.visible = visible;
         this.tags = new TagList();
     }
 
-    public static Node fromXML(org.w3c.dom.Node rawNode) {
-        long id = Long.parseLong(rawNode.getAttributes().getNamedItem("id").getNodeValue());
+    /** Constructs a Node from an org.w3c.dom XML Node. */
+    public static Node fromXML(org.w3c.dom.Node rawNode) throws UserInputException {
+        long id;
+        try {
+            id = Long.parseLong(rawNode.getAttributes().getNamedItem("id").getNodeValue());
+        } catch (NullPointerException e) {
+            throw new UserInputException("Encountered a node without an id.");
+        }
 
-        double lon = Double.parseDouble(rawNode.getAttributes().getNamedItem("lon").getNodeValue());
-        double lat = Double.parseDouble(rawNode.getAttributes().getNamedItem("lat").getNodeValue());
+        double lon;
+        double lat;
+        try {
+            lon = Double.parseDouble(rawNode.getAttributes().getNamedItem("lon").getNodeValue());
+            lat = Double.parseDouble(rawNode.getAttributes().getNamedItem("lat").getNodeValue());
+        } catch (NullPointerException e) {
+            throw new UserInputException("Encountered a node without full positioning information.");
+        }
         WGS84Coordinate position = new WGS84Coordinate(lon, lat);
 
-        boolean visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
+        boolean visible = true;
+        try {
+            visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
+        } catch (NullPointerException ignored) {}
 
         Node newNode = new Node(id, position, visible);
 
