@@ -81,7 +81,7 @@ public class App {
         OSM mapData = OSM.fromXML(doc);
 
         // Render the map
-        Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(mapData.getMinLon(), mapData.getMaxLat()));
+        Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(mapData.getBoundingBox().getMinLon(), mapData.getBoundingBox().getMaxLat()));
         MapRenderer renderer = new MapRenderer(mapData, projection);
         renderer.renderToStream(outputFile);
     }

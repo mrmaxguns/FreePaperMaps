@@ -43,6 +43,7 @@ public abstract class Coordinate<T extends Coordinate<T>> {
         return createInstance(x * scaleFactor, y * scaleFactor);
     }
 
+    // TODO: Make this more reasonable than == with doubles
     public boolean equals(T other) {
         return x == other.getX() && y == other.getY();
     }

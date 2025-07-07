@@ -38,4 +38,8 @@ public class BoundingBox<C extends Coordinate<C>> {
     public double getHeight() {
         return height;
     }
+
+    public boolean equals(BoundingBox<C> other) {
+        return topLeftCorner.equals(other.getTopLeftCorner()) && bottomRightCorner.equals(other.getBottomRightCorner());
+    }
 }
