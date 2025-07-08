@@ -59,8 +59,6 @@ public class OSM {
 
     /** Constructs an OSM object from an OSM XML file. */
     public static OSM fromXML(Document doc) throws UserInputException {
-        doc.getDocumentElement().normalize();
-
         // Get map bounds
         BoundingBox<WGS84Coordinate> boundingBox = null;
         try {

@@ -1,10 +1,13 @@
 package io.github.mrmaxguns.freepapermaps;
 
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
+import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
 import io.github.mrmaxguns.freepapermaps.projections.Projection;
 import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
+import io.github.mrmaxguns.freepapermaps.rendering.MapStyle;
+import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Document;
@@ -14,6 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.Objects;
 
 
 public class App {
@@ -21,6 +25,8 @@ public class App {
         // Define command-line flags
         Options options = new Options();
         options.addOption("o", "output", true, "write the SVG to a specified output file instead of stdout");
+        options.addOption("s", "style", true, "specify an XML style file");
+        options.addOption("c", "scale", true, "set the map scale (1:SCALE)");
 
         // Parse command-line options
         CommandLineParser parser = new DefaultParser();
@@ -53,9 +59,19 @@ public class App {
             outputFile = System.out;
         }
 
+        String styleFileName = null;
+        if (cmd.hasOption("s")) {
+            styleFileName = cmd.getOptionValue("s");
+        }
+
+        double scale = 1.0;
+        if (cmd.hasOption("c")) {
+            scale = Double.parseDouble(cmd.getOptionValue("c"));
+        }
+
         // Create the map!
         try {
-            createMap(inputFileName, outputFile);
+            createMap(inputFileName, styleFileName, outputFile, scale);
         } catch (UserInputException e) {
             // Handle gracefully any errors that should be messaged to the user
             System.err.println(e.getMessage());
@@ -63,26 +79,38 @@ public class App {
         }
     }
 
-    private static void createMap(String inputFileName, OutputStream outputFile)
-            throws ParserConfigurationException, UserInputException, UnsupportedEncodingException, SVGGraphics2DIOException  {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    private static void createMap(String inputFileName, String styleFileName, OutputStream outputFile, double scale)
+            throws ParserConfigurationException, UserInputException, SVGGraphics2DIOException  {
+        // Gather necessary resources
+        OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)));
 
-        // Try to open the file
+        MapStyle mapStyle;
+        if (styleFileName != null) {
+            mapStyle = MapStyle.fromXML(openXMLFile(styleFileName));
+        } else {
+            mapStyle = MapStyle.defaultMapStyle();
+        }
+
+        // Render the map
+        WGS84Coordinate origin = mapData.getNodeBoundingBox().getTopLeftCorner();
+        Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(origin.getLon(), origin.getLat()));
+        Scaler scaler = new Scaler(scale);
+        MapRenderer renderer = new MapRenderer(mapData, mapStyle, projection, scaler);
+        renderer.renderToStream(outputFile);
+    }
+
+    private static Document openXMLFile(String fileName) throws ParserConfigurationException, UserInputException {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc;
         try {
-            doc = builder.parse(new File(inputFileName));
+            doc = builder.parse(new File(fileName));
         } catch (SAXException e) {
             throw new UserInputException("Malformed XML detected in input file:\n" + e.getMessage());
         } catch (IOException e) {
-            throw new UserInputException("File '" + inputFileName + "' could not be opened. Does it exist?");
+            throw new UserInputException("File '" + fileName + "' could not be opened. Does it exist?");
         }
 
-        // Parse the OSM XML file
-        OSM mapData = OSM.fromXML(doc);
-
-        // Render the map
-        Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(mapData.getBoundingBox().getMinLon(), mapData.getBoundingBox().getMaxLat()));
-        MapRenderer renderer = new MapRenderer(mapData, projection);
-        renderer.renderToStream(outputFile);
+        doc.getDocumentElement().normalize();
+        return doc;
     }
 }

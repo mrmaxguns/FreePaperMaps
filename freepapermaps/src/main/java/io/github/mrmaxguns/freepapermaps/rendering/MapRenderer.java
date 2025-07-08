@@ -20,11 +20,15 @@ import org.apache.batik.svggen.SVGGraphics2DIOException;
 
 public class MapRenderer {
     private final OSM mapData;
+    private final MapStyle style;
     private final Projection projection;
+    private final Scaler scaler;
 
-    public MapRenderer(OSM mapData, Projection projection) {
+    public MapRenderer(OSM mapData, MapStyle style, Projection projection, Scaler scaler) {
         this.mapData = mapData;
+        this.style = style;
         this.projection = projection;
+        this.scaler = scaler;
     }
 
     public void renderToStream(OutputStream outputFile) throws SVGGraphics2DIOException {
@@ -44,22 +48,6 @@ public class MapRenderer {
     }
 
     public void renderToGraphics2D(Graphics2D g2d) {
-        // TODO: Do some actual mapping
-
-        // A simple algorithm that draws each way with a different-colored line.
-        Random rd = new Random();
-        for (Way way : mapData.getWays()) {
-            g2d.setColor(new Color(rd.nextFloat(), rd.nextFloat(), rd.nextFloat()));
-            GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, way.getNodeIds().size());
-            for (int i = 0; i < way.getNodeIds().size(); ++i) {
-                ProjectedCoordinate position = projection.project(mapData.getNodeById(way.getNodeIds().get(i)).getPosition());
-                if (i == 0) {
-                    polyline.moveTo(position.getX(), position.getY());
-                } else {
-                    polyline.lineTo(position.getX(), position.getY());
-                }
-            }
-            g2d.draw(polyline);
-        }
+        style.compile(mapData, projection, scaler).render(g2d);
     }
 }

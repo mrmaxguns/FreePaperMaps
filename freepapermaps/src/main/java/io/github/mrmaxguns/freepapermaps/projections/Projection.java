@@ -22,4 +22,9 @@ public abstract class Projection {
 
     /** Converts a WGS84 Coordinate to a Projected Coordinate based on the current projection. */
     public abstract ProjectedCoordinate project(WGS84Coordinate original);
+
+    /** Projects a WGS84 Bounding Box to a Projected Bounding Box. */
+    public BoundingBox<ProjectedCoordinate> project(BoundingBox<WGS84Coordinate> original) {
+        return new BoundingBox<>(project(original.getTopLeftCorner()), project(original.getBottomRightCorner()));
+    }
 }
