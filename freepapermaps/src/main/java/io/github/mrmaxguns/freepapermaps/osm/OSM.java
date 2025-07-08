@@ -1,10 +1,10 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
+import io.github.mrmaxguns.freepapermaps.XMLTools;
 import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
@@ -59,20 +59,17 @@ public class OSM {
 
     /** Constructs an OSM object from an OSM XML file. */
     public static OSM fromXML(Document doc) throws UserInputException {
+        XMLTools xmlTools = new XMLTools("OSM Data File");
+
         // Get map bounds
         BoundingBox<WGS84Coordinate> boundingBox = null;
-        try {
-            NamedNodeMap bounds = doc.getElementsByTagName("bounds").item(0).getAttributes();
-            double minLat = Double.parseDouble(bounds.getNamedItem("minlat").getNodeValue());
-            double minLon = Double.parseDouble(bounds.getNamedItem("minlon").getNodeValue());
-            double maxLat = Double.parseDouble(bounds.getNamedItem("maxlat").getNodeValue());
-            double maxLon = Double.parseDouble(bounds.getNamedItem("maxlon").getNodeValue());
 
-            boundingBox = new BoundingBox<>(
-                    new WGS84Coordinate(minLon, maxLat),
-                    new WGS84Coordinate(maxLon, minLat)
-            );
-        } catch (NullPointerException ignored) {}
+        org.w3c.dom.Node bounds = xmlTools.getSingleTag(doc, "bounds");
+        double minLat = xmlTools.getAttributeValueDouble(bounds, "minlat");
+        double minLon = xmlTools.getAttributeValueDouble(bounds, "minlon");
+        double maxLat = xmlTools.getAttributeValueDouble(bounds, "maxlat");
+        double maxLon = xmlTools.getAttributeValueDouble(bounds, "maxlon");
+        boundingBox = new BoundingBox<>(new WGS84Coordinate(minLon, maxLat), new WGS84Coordinate(maxLon, minLat));
 
         // Create the OSM object
         OSM newOSM = new OSM(boundingBox);

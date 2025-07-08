@@ -1,6 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
+import io.github.mrmaxguns.freepapermaps.XMLTools;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.NodeList;
 
@@ -28,27 +29,19 @@ public class Node {
 
     /** Constructs a Node from an org.w3c.dom XML Node. */
     public static Node fromXML(org.w3c.dom.Node rawNode) throws UserInputException {
-        long id;
-        try {
-            id = Long.parseLong(rawNode.getAttributes().getNamedItem("id").getNodeValue());
-        } catch (NullPointerException e) {
-            throw new UserInputException("Encountered a node without an id.");
-        }
+        XMLTools xmlTools = new XMLTools();
 
-        double lon;
-        double lat;
-        try {
-            lon = Double.parseDouble(rawNode.getAttributes().getNamedItem("lon").getNodeValue());
-            lat = Double.parseDouble(rawNode.getAttributes().getNamedItem("lat").getNodeValue());
-        } catch (NullPointerException e) {
-            throw new UserInputException("Encountered a node without full positioning information.");
-        }
+        long id = xmlTools.getAttributeValueLong(rawNode, "id");
+
+        double lon = xmlTools.getAttributeValueDouble(rawNode, "lon");
+        double lat = xmlTools.getAttributeValueDouble(rawNode, "lat");
         WGS84Coordinate position = new WGS84Coordinate(lon, lat);
 
         boolean visible = true;
-        try {
-            visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
-        } catch (NullPointerException ignored) {}
+        String visibleRaw = xmlTools.getOptionalAttributeValue(rawNode, "visible");
+        if (visibleRaw != null) {
+            visible = Boolean.parseBoolean(visibleRaw);
+        }
 
         Node newNode = new Node(id, position, visible);
 

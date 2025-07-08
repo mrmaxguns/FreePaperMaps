@@ -1,6 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
+import io.github.mrmaxguns.freepapermaps.XMLTools;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
@@ -26,17 +27,15 @@ public class Way {
 
     /** Constructs a Way object from an org.w3c.dom XML Node. */
     public static Way fromXML(org.w3c.dom.Node rawNode) throws UserInputException {
-        long id;
-        try {
-            id = Long.parseLong(rawNode.getAttributes().getNamedItem("id").getNodeValue());
-        } catch (NullPointerException e) {
-            throw new UserInputException("Encountered a way without an id.");
-        }
+        XMLTools xmlTools = new XMLTools();
+
+        long id = xmlTools.getAttributeValueLong(rawNode, "id");
 
         boolean visible = true;
-        try {
-            visible = Boolean.parseBoolean(rawNode.getAttributes().getNamedItem("visible").getNodeValue());
-        } catch (NullPointerException ignored) {}
+        String visibleRaw = xmlTools.getOptionalAttributeValue(rawNode, "visible");
+        if (visibleRaw != null) {
+            visible = Boolean.parseBoolean(visibleRaw);
+        }
 
         Way newWay = new Way(id, visible);
 
@@ -47,21 +46,12 @@ public class Way {
             org.w3c.dom.Node child = children.item(i);
             if (child.getNodeName().equals("nd")) {
                 // Parse node references
-                try {
-                    newWay.getNodeIds().add(Long.parseLong(child.getAttributes().getNamedItem("ref").getNodeValue()));
-                } catch (NullPointerException e) {
-                    throw new UserInputException("Found a 'nd' in way " + id + " without a 'ref' value.");
-                }
+                newWay.getNodeIds().add(xmlTools.getAttributeValueLong(child, "ref"));
             } else if (child.getNodeName().equals("tag")) {
                 // Parse tags
-                try {
-                    newWay.getTags().put(
-                            child.getAttributes().getNamedItem("k").getNodeValue(),
-                            child.getAttributes().getNamedItem("v").getNodeValue()
-                    );
-                } catch (NullPointerException e) {
-                    throw new UserInputException("Found a tag in way " + id + " missing either 'k' or 'v' (or both).");
-                }
+                newWay.getTags().put(
+                        xmlTools.getAttributeValue(child, "k"),
+                        xmlTools.getAttributeValue(child, "v"));
             }
         }
 

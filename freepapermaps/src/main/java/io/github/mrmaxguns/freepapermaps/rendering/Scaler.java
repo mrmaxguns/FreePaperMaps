@@ -35,6 +35,10 @@ public class Scaler {
         return new ScaledCoordinate(c.getX() * scaleFactor, c.getY() * scaleFactor);
     }
 
+    public BoundingBox<ScaledCoordinate> scale(BoundingBox<ProjectedCoordinate> b) {
+        return new BoundingBox<>(scale(b.getTopLeftCorner()), scale(b.getBottomRightCorner()));
+    }
+
     public double getMapScale() {
         return mapScale;
     }

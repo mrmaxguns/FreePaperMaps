@@ -3,7 +3,7 @@ package io.github.mrmaxguns.freepapermaps;
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.projections.*;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
-import io.github.mrmaxguns.freepapermaps.rendering.MapStyle;
+import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;

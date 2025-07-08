@@ -1,26 +1,53 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
+import io.github.mrmaxguns.freepapermaps.XMLTools;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /** Represents a collection of tags associated with a Node, Way, or Relation. */
 public class TagList extends HashMap<String, String> {
     public void insertFromXML(NodeList tags) throws UserInputException {
+        XMLTools xmlTools = new XMLTools();
+
         for (int i = 0; i < tags.getLength(); ++i) {
             Node tag = tags.item(i);
             if (tag.getNodeName().equals("tag")) {
-                try {
-                    put(
-                            tag.getAttributes().getNamedItem("k").getNodeValue(),
-                            tag.getAttributes().getNamedItem("v").getNodeValue()
-                    );
-                } catch (NullPointerException e) {
-                    throw new UserInputException("Found a tag missing either 'k' or 'v' (or both).");
+                put(xmlTools.getAttributeValue(tag, "k"), xmlTools.getAttributeValue(tag, "v"));
+            }
+        }
+    }
+
+    /**
+     * Whether this TagList is a subset of <code>other</code>.
+     * <p>
+     * This is a special type of subset that is useful for queries. There is a very particular treatment of ""/null values
+     * that allows ""/null to be used as a "wildcard". In other words, if this TagList contains a key with a ""/null value,
+     * it will count as a match even if the other TagList we're checking has a non-null value, but this property doesn't
+     * go both ways.
+     */
+    public boolean isQuerySubset(TagList other) {
+        for (Map.Entry<String, String> entry : entrySet()) {
+            if (!other.containsKey(entry.getKey())) {
+                return false;
+            }
+
+            String val = entry.getValue();
+            String otherVal = other.get(entry.getKey());
+            boolean valIsEmpty = val == null || val.isEmpty();
+            boolean otherValIsEmpty = otherVal == null || otherVal.isEmpty();
+
+            if (!valIsEmpty && otherValIsEmpty) {
+                return false;
+            } else if (!valIsEmpty) {
+                if (!val.equals(otherVal)) {
+                    return false;
                 }
             }
         }
+        return true;
     }
 }
