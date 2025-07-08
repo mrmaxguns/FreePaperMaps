@@ -1,10 +1,7 @@
 package io.github.mrmaxguns.freepapermaps;
 
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
-import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
-import io.github.mrmaxguns.freepapermaps.projections.Projection;
-import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
-import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
+import io.github.mrmaxguns.freepapermaps.projections.*;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
 import io.github.mrmaxguns.freepapermaps.rendering.MapStyle;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
@@ -21,12 +18,15 @@ import java.util.Objects;
 
 
 public class App {
+    enum ScaleOption {
+        Fixed,
+        Width,
+        Height
+    }
+
     public static void main(String[] args) throws ParserConfigurationException, UnsupportedEncodingException, SVGGraphics2DIOException {
         // Define command-line flags
-        Options options = new Options();
-        options.addOption("o", "output", true, "write the SVG to a specified output file instead of stdout");
-        options.addOption("s", "style", true, "specify an XML style file");
-        options.addOption("c", "scale", true, "set the map scale (1:SCALE)");
+        Options options = getOptions();
 
         // Parse command-line options
         CommandLineParser parser = new DefaultParser();
@@ -64,14 +64,25 @@ public class App {
             styleFileName = cmd.getOptionValue("s");
         }
 
-        double scale = 1.0;
+        double scale;
+        ScaleOption scaleOption;
         if (cmd.hasOption("c")) {
             scale = Double.parseDouble(cmd.getOptionValue("c"));
+            scaleOption = ScaleOption.Fixed;
+        } else if (cmd.hasOption("w")) {
+            scale = Double.parseDouble(cmd.getOptionValue("w"));
+            scaleOption = ScaleOption.Width;
+        } else if (cmd.hasOption("h")) {
+            scale = Double.parseDouble(cmd.getOptionValue("h"));
+            scaleOption = ScaleOption.Height;
+        } else {
+            scale = 1;
+            scaleOption = ScaleOption.Fixed;
         }
 
         // Create the map!
         try {
-            createMap(inputFileName, styleFileName, outputFile, scale);
+            createMap(inputFileName, styleFileName, outputFile, scale, scaleOption);
         } catch (UserInputException e) {
             // Handle gracefully any errors that should be messaged to the user
             System.err.println(e.getMessage());
@@ -79,7 +90,18 @@ public class App {
         }
     }
 
-    private static void createMap(String inputFileName, String styleFileName, OutputStream outputFile, double scale)
+    private static Options getOptions() {
+        Options options = new Options();
+        options.addOption("o", "output", true, "write the SVG to a specified output file instead of stdout");
+        options.addOption("s", "style", true, "specify an XML style file");
+        options.addOption("c", "scale", true, "set the map scale (1:SCALE) (cannot use with -w or -h)");
+        options.addOption("w", "width", true, "set the map width in mm (cannot use with -c or -h)");
+        options.addOption("h", "height", true, "set the map height in mm (cannot use with -c or -w)");
+        return options;
+    }
+
+    private static void createMap(String inputFileName, String styleFileName, OutputStream outputFile,
+                                  double scale, ScaleOption scaleOption)
             throws ParserConfigurationException, UserInputException, SVGGraphics2DIOException  {
         // Gather necessary resources
         OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)));
@@ -91,10 +113,22 @@ public class App {
             mapStyle = MapStyle.defaultMapStyle();
         }
 
-        // Render the map
+        // Create the projection so that the origin is the top-left-most point (even if the point is outside our final
+        // bounding box).
         WGS84Coordinate origin = mapData.getNodeBoundingBox().getTopLeftCorner();
         Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(origin.getLon(), origin.getLat()));
-        Scaler scaler = new Scaler(scale);
+
+        // Create a scaler based on user options. The scaler is based on the final bounding box, since that is what's
+        // returned to the user.
+        BoundingBox<ProjectedCoordinate> projectedBounds = projection.project(mapData.getBoundingBox());
+        Scaler scaler = null;
+        switch (scaleOption) {
+            case Fixed -> scaler = new Scaler(scale);
+            case Width -> scaler = Scaler.newScalerFromWidth(projectedBounds, scale);
+            case Height -> scaler = Scaler.newScalerFromHeight(projectedBounds, scale);
+        }
+
+        // Render the map!
         MapRenderer renderer = new MapRenderer(mapData, mapStyle, projection, scaler);
         renderer.renderToStream(outputFile);
     }
