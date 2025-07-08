@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.w3c.dom.Element;
 
 
 public class MapRenderer {
@@ -37,12 +38,23 @@ public class MapRenderer {
 
         // Draw the map
         renderToGraphics2D(svgGenerator);
-        svgGenerator.setSVGCanvasSize(svgGenerator.getClipBounds().getSize());
+
+        // Do some unit magic so that the SVG turns out the correct size
+        Element svgRoot = svgGenerator.getRoot(document.getDocumentElement());
+        svgRoot.appendChild(svgGenerator.getRoot());
+
+        int width = svgGenerator.getClipBounds().width;
+        int height = svgGenerator.getClipBounds().height;
+
+        svgRoot.setAttribute("width", width + "mm");
+        svgRoot.setAttribute("height", height + "mm");
+        svgRoot.setAttribute("viewBox", "0 0 " + width + " " + height);
 
         // Stream the SVG to a file
         boolean useCSS = true;
+        boolean escaped = true;
         Writer out = new OutputStreamWriter(outputFile, StandardCharsets.UTF_8);
-        svgGenerator.stream(out, useCSS);
+        svgGenerator.stream(svgRoot, out, useCSS, escaped);
     }
 
     public void renderToGraphics2D(Graphics2D g2d) {
