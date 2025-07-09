@@ -5,14 +5,12 @@ import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
 import java.util.List;
 
+import static io.github.mrmaxguns.freepapermaps.TestingUtility.loadXMLDocumentFromString;
 import static org.junit.jupiter.api.Assertions.*;
+
 
 public class OSMTest {
     private final static String VALID_XML = """
@@ -138,20 +136,13 @@ public class OSMTest {
             </osm>
             """;
 
-    Document validDoc;
-    OSM validOSM;
+    private final OSM validOSM;
 
     public OSMTest() throws Exception {
-        validDoc = loadXMLFromString(VALID_XML);
+        Document validDoc = loadXMLDocumentFromString(VALID_XML);
         validOSM = OSM.fromXML(validDoc);
     }
 
-    private static Document loadXMLFromString(String xml) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(xml));
-        return builder.parse(is);
-    }
 
     @Test
     public void testConstructor() {
@@ -212,7 +203,7 @@ public class OSMTest {
     public void testFromXMLMissingBound() throws Exception {
         String[] attrs = {"minlat", "minlon", "maxlat", "maxlon"};
         for (String attr : attrs) {
-            Document doc = loadXMLFromString(VALID_XML);
+            Document doc = loadXMLDocumentFromString(VALID_XML);
             doc.getElementsByTagName("bounds").item(0).getAttributes().removeNamedItem("minlon");
             assertThrows(UserInputException.class, () -> OSM.fromXML(doc), "missing required attribute " + attr + " should cause an error");
         }
@@ -237,7 +228,7 @@ public class OSMTest {
 
     @Test
     public void testAddNode() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         Node newNode = new Node(12345L, new WGS84Coordinate(-98, -33.2), true);
         osm.addNode(newNode);
         assertAll(
@@ -248,7 +239,7 @@ public class OSMTest {
 
     @Test
     public void testRemoveNodeByIdNoBoundAdjustment() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         long id = 2933427973L;
         osm.removeNodeById(id);
         assertAll(
@@ -260,7 +251,7 @@ public class OSMTest {
 
     @Test
     public void testRemoveNodeByIdWithBoundAdjustment() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         long id = 2933410035L;
         osm.removeNodeById(id);
         assertAll(
@@ -272,7 +263,7 @@ public class OSMTest {
 
     @Test
     public void testRemoveNodeByIdWithBoundAdjustmentExplicitlyDisabled() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         long id = 2933410027L;
         osm.removeNodeById(id, false);
         assertAll(
@@ -291,7 +282,7 @@ public class OSMTest {
 
     @Test
     public void testClearNodes() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         osm.clearNodes();
         assertAll(
                 () -> assertTrue(osm.getNodes().isEmpty(), "clearNodes should clear the node list"),
@@ -318,7 +309,7 @@ public class OSMTest {
 
     @Test
     public void testAddWay() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         Way newWay = new Way(12345, true);
         osm.addWay(newWay);
         assertEquals(newWay, osm.getWayById(newWay.getId()), "addWay should add the way itself, rather than a copy");
@@ -326,7 +317,7 @@ public class OSMTest {
 
     @Test
     public void testRemoveWayById() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         long id = 1259737750L;
         osm.removeWayById(id);
         assertNull(osm.getWayById(id), "removeWayById should remove the requested way");
@@ -341,7 +332,7 @@ public class OSMTest {
 
     @Test
     public void testClearWays() throws Exception {
-        OSM osm = OSM.fromXML(loadXMLFromString(VALID_XML));
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
         osm.clearWays();
         assertTrue(osm.getWays().isEmpty(), "clearWays should clear the way list");
     }
