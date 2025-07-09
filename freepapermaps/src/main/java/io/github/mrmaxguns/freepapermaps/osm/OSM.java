@@ -136,7 +136,7 @@ public class OSM {
      * as necessary.
      */
     public void removeNodeById(long id) {
-        removeNodeById(id, false);
+        removeNodeById(id, true);
     }
 
     /** Clears the list of Nodes. */

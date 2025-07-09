@@ -28,7 +28,7 @@ public class XMLTools {
     public String getAttributeValue(Node node, String attributeName) throws UserInputException {
         Node attribute = node.getAttributes().getNamedItem(attributeName);
         if (attribute == null) {
-            error("Found tag at " + node.getBaseURI() + " that does not have required attribute " + attributeName + "'.");
+            error("Found tag that does not have required attribute '" + attributeName + "'.");
         }
         //noinspection DataFlowIssue
         return attribute.getNodeValue();
