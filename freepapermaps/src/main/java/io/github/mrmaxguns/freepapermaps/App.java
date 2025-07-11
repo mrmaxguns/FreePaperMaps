@@ -3,8 +3,8 @@ package io.github.mrmaxguns.freepapermaps;
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.projections.*;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
-import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
+import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Document;
@@ -16,6 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.Objects;
 
+import static io.github.mrmaxguns.freepapermaps.UnitManager.parseNumberWithUnit;
+
 
 public class App {
     enum ScaleOption {
@@ -24,36 +26,44 @@ public class App {
         Height
     }
 
-    public static void main(String[] args) throws ParserConfigurationException, UnsupportedEncodingException, SVGGraphics2DIOException {
+    public static void main(String[] args) throws ParserConfigurationException, SVGGraphics2DIOException {
+        try {
+            runProgram(args);
+        } catch (UserInputException e) {
+            // Handle gracefully any errors that should be messaged to the user
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    public static void runProgram(String[] args) throws ParserConfigurationException, SVGGraphics2DIOException,
+            UserInputException {
         // Define command-line flags
         Options options = getOptions();
 
         // Parse command-line options
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
+        CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            System.err.println("Could not parse command-line arguments.");
-            System.exit(1);
+            throw new UserInputException("Could not parse command-line arguments.");
         }
 
         // Handle the input file argument
         String[] leftOverArgs = cmd.getArgs();
         if (leftOverArgs.length != 1) {
-            System.err.println("Expected exactly one (non-flag) argument: the name of the OSM input file.");
-            System.exit(1);
+            throw new UserInputException("Expected exactly one (non-flag) argument: the name of the OSM input file.");
         }
         String inputFileName = leftOverArgs[0];
 
         // Handle flags
-        OutputStream outputFile = null;
+        OutputStream outputFile;
         if (cmd.hasOption("o")) {
             try {
                 outputFile = new FileOutputStream(cmd.getOptionValue("o"));
             } catch (FileNotFoundException e) {
-                System.err.println("Could not write to output file.");
-                System.exit(1);
+                throw new UserInputException("Could not write to output file.");
             }
         } else {
             outputFile = System.out;
@@ -67,13 +77,17 @@ public class App {
         double scale;
         ScaleOption scaleOption;
         if (cmd.hasOption("c")) {
-            scale = Double.parseDouble(cmd.getOptionValue("c"));
+            try {
+                scale = Double.parseDouble(cmd.getOptionValue("c"));
+            } catch (NumberFormatException e) {
+                throw new UserInputException("Map scale must be a number.");
+            }
             scaleOption = ScaleOption.Fixed;
         } else if (cmd.hasOption("w")) {
-            scale = Double.parseDouble(cmd.getOptionValue("w"));
+            scale = parseNumberWithUnit(cmd.getOptionValue("w"));
             scaleOption = ScaleOption.Width;
         } else if (cmd.hasOption("h")) {
-            scale = Double.parseDouble(cmd.getOptionValue("h"));
+            scale = parseNumberWithUnit(cmd.getOptionValue("h"));
             scaleOption = ScaleOption.Height;
         } else {
             scale = 1;
@@ -81,13 +95,7 @@ public class App {
         }
 
         // Create the map!
-        try {
-            createMap(inputFileName, styleFileName, outputFile, scale, scaleOption);
-        } catch (UserInputException e) {
-            // Handle gracefully any errors that should be messaged to the user
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
+        createMap(inputFileName, styleFileName, outputFile, scale, scaleOption);
     }
 
     private static Options getOptions() {
@@ -95,8 +103,8 @@ public class App {
         options.addOption("o", "output", true, "write the SVG to a specified output file instead of stdout");
         options.addOption("s", "style", true, "specify an XML style file");
         options.addOption("c", "scale", true, "set the map scale (1:SCALE) (cannot use with -w or -h)");
-        options.addOption("w", "width", true, "set the map width in mm (cannot use with -c or -h)");
-        options.addOption("h", "height", true, "set the map height in mm (cannot use with -c or -w)");
+        options.addOption("w", "width", true, "set the map width with a unit (cannot use with -c or -h)");
+        options.addOption("h", "height", true, "set the map height with a unit (cannot use with -c or -w)");
         return options;
     }
 
