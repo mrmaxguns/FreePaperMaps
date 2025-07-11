@@ -39,20 +39,28 @@ public class BoundingBox<C extends Coordinate<C>> {
         return height;
     }
 
-    public double getMinX() { return topLeftCorner.getX(); }
-    public double getMinLon() { return topLeftCorner.getLon(); }
+    public double getMinX()   { return Math.min(topLeftCorner.getX(), bottomRightCorner.getX()); }
 
-    public double getMaxX() { return bottomRightCorner.getX(); }
-    public double getMaxLon() { return bottomRightCorner.getLon(); }
+    public double getMinLon() { return getMinX(); }
 
-    public double getMinY() { return bottomRightCorner.getY(); }
-    public double getMinLat() { return bottomRightCorner.getLat(); }
+    public double getMaxX()   { return Math.max(topLeftCorner.getX(), bottomRightCorner.getX()); }
 
-    public double getMaxY() { return topLeftCorner.getY(); }
-    public double getMaxLat() { return topLeftCorner.getLat(); }
+    public double getMaxLon() { return getMaxX(); }
+
+    public double getMinY()   { return Math.min(topLeftCorner.getY(), bottomRightCorner.getY()); }
+
+    public double getMinLat() { return getMinY(); }
+
+    public double getMaxY()   { return Math.max(topLeftCorner.getY(), bottomRightCorner.getY()); }
+
+    public double getMaxLat() { return getMaxY(); }
 
     /** Returns true if the corners of both bounding boxes are equal, as defined by the Coordinate equals method. */
     public boolean equals(BoundingBox<C> other) {
         return topLeftCorner.equals(other.getTopLeftCorner()) && bottomRightCorner.equals(other.getBottomRightCorner());
+    }
+
+    public String toString() {
+        return "BoundingBox(topLeftCorner=" + topLeftCorner + ", bottomRightCorner=" + bottomRightCorner + ")";
     }
 }
