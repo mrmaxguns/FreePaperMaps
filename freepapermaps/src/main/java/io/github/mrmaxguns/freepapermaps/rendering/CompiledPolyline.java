@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 
+
+/** A CompiledPolyline is a line formed by going from one point to the next in a straight line. */
 public class CompiledPolyline extends CompiledGeometry {
     private final ArrayList<ProjectedCoordinate> points;
     private final PolylineLayer style;

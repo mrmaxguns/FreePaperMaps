@@ -192,7 +192,7 @@ public class MapStyle {
      * happen efficiently.
      */
     public CompiledMap compile(OSM mapData, Projection projection, Scaler scaler) throws UserInputException {
-        CompiledMap map = new CompiledMap(mapData, projection, scaler);
+        CompiledMap map = new CompiledMap(mapData, this, projection, scaler);
 
         for (TaggedLayer taggedLayer : orderedLayers) {
             // Process Node layers

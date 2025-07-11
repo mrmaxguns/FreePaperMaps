@@ -39,6 +39,14 @@ public class Scaler {
         return new BoundingBox<>(scale(b.getTopLeftCorner()), scale(b.getBottomRightCorner()));
     }
 
+    public static int asInteger(double val) {
+        return (int) Math.round(val);
+    }
+
+    public static long asLong(double val) {
+        return Math.round(val);
+    }
+
     public double getMapScale() {
         return mapScale;
     }
