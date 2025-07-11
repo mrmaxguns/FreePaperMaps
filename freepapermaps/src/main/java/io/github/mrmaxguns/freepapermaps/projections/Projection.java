@@ -1,5 +1,9 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+
 /**
  * Projection represents a construct that allows converting between WGS84 coordinates and Projected coordinates.
  * Examples of projections include Mercator and Lambert Conformal Conic.
@@ -26,5 +30,10 @@ public abstract class Projection {
     /** Projects a WGS84 Bounding Box to a Projected Bounding Box. */
     public BoundingBox<ProjectedCoordinate> project(BoundingBox<WGS84Coordinate> original) {
         return new BoundingBox<>(project(original.getTopLeftCorner()), project(original.getBottomRightCorner()));
+    }
+
+    /** Projects a list of WGS84 Coordinates into Projected Coordinates. */
+    public List<ProjectedCoordinate> project(List<WGS84Coordinate> original) {
+        return original.stream().map(this::project).collect(Collectors.toList());
     }
 }

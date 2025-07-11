@@ -183,6 +183,29 @@ public class OSM {
         }
     }
 
+    /** Given a way id, creates a list of all Nodes in the Way. */
+    public List<Node> getNodesInWay(long wayId) throws UserInputException {
+        Way way = getWayById(wayId);
+
+        if (way == null) {
+            return null;
+        }
+
+        ArrayList<Node> nodes = new ArrayList<>(way.getNodeIds().size());
+        for (long nodeId : way.getNodeIds()) {
+            Node n = getNodeById(nodeId);
+
+            if (n == null) {
+                throw new UserInputException(
+                        "Way with id " + wayId + " references node with id " + nodeId + " that doesn't exist.");
+            }
+
+            nodes.add(n);
+        }
+
+        return nodes;
+    }
+
     /** If node n is outside the current nodeBoundingBox, this function expands it to contain n. */
     private void adjustBoundsIfNecessary(Node n) {
         boolean boundsChanged = false;
