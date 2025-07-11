@@ -31,6 +31,7 @@ public class OSM {
     /** A bounding box defining the geographic area to be rendered. Can be null. */
     private BoundingBox<WGS84Coordinate> boundingBox;
 
+    // TODO: Refactor using Map
     /** A list of nodes. */
     private final ArrayList<Node> nodes;
     /** A list of ways. */
