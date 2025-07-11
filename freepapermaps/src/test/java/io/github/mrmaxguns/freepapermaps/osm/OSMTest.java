@@ -170,22 +170,12 @@ public class OSMTest {
 
     @Test
     public void testFromXMLValidNodes() {
-        assertAll(
-                () -> assertEquals(31, validOSM.getNodes().size(), "all nodes should be added to `nodes`"),
-                () -> assertEquals(2933410027L, validOSM.getNodes().get(0).getId(), "nodes should remain in order"),
-                () -> assertEquals(2933410032L, validOSM.getNodes().get(5).getId(), "nodes should remain in order"),
-                () -> assertEquals(11711578170L, validOSM.getNodes().get(30).getId(), "nodes should remain in order")
-        );
+        assertEquals(31, validOSM.getNodes().size(), "all nodes should be added to `nodes`");
     }
 
     @Test
     public void testFromXMLValidWays() {
-        assertAll(
-                () -> assertEquals(5, validOSM.getWays().size(), "all ways should be added to `ways`"),
-                () -> assertEquals(289801716L, validOSM.getWays().get(0).getId(), "ways should remain in order"),
-                () -> assertEquals(289804782L, validOSM.getWays().get(3).getId(), "ways should remain in order"),
-                () -> assertEquals(1259737750L, validOSM.getWays().get(4).getId(), "ways should remain in order")
-        );
+        assertEquals(5, validOSM.getWays().size(), "all ways should be added to `ways`");
     }
 
     @Test

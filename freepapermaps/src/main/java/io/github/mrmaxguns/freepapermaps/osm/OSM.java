@@ -8,7 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -31,11 +31,10 @@ public class OSM {
     /** A bounding box defining the geographic area to be rendered. Can be null. */
     private BoundingBox<WGS84Coordinate> boundingBox;
 
-    // TODO: Refactor using Map
     /** A list of nodes. */
-    private final ArrayList<Node> nodes;
+    private final HashMap<Long, Node> nodes;
     /** A list of ways. */
-    private final ArrayList<Way> ways;
+    private final HashMap<Long, Way> ways;
 
     /**
      * A bounding box defining an area containing all nodes. When exporting a region from OpenStreetMap, the region's
@@ -53,8 +52,8 @@ public class OSM {
      */
     public OSM(BoundingBox<WGS84Coordinate> boundingBox) {
         this.boundingBox = boundingBox;
-        this.nodes = new ArrayList<>();
-        this.ways = new ArrayList<>();
+        this.nodes = new HashMap<>();
+        this.ways = new HashMap<>();
         this.nodeBoundingBox = null;
     }
 
@@ -100,18 +99,18 @@ public class OSM {
 
     /** Returns a non-modifiable list of Nodes. */
     public List<Node> getNodes() {
-        return Collections.unmodifiableList(nodes);
+        return List.copyOf(nodes.values());
     }
 
     /** Returns a Node given an id, or null if no such Node exists. */
     public Node getNodeById(long id) {
-        return nodes.stream().filter(n -> n.getId() == id).findAny().orElse(null);
+        return nodes.get(id);
     }
 
     /** Adds a new Node to the list of Nodes. */
     public void addNode(Node newNode) {
         // Add the node
-        this.nodes.add(newNode);
+        nodes.put(newNode.getId(), newNode);
 
         // Adjust bounds accordingly
         adjustBoundsIfNecessary(newNode);
@@ -125,7 +124,7 @@ public class OSM {
      *                     this to false and then call adjustNodeBounds at the end.
      */
     public void removeNodeById(long id, boolean adjustBounds) {
-        nodes.removeIf(n -> n.getId() == id);
+        nodes.remove(id);
 
         if (adjustBounds) {
             adjustNodeBounds();
@@ -148,22 +147,22 @@ public class OSM {
 
     /** Returns a non-modifiable list of Ways. */
     public List<Way> getWays() {
-        return Collections.unmodifiableList(ways);
+        return List.copyOf(ways.values());
     }
 
     /** Returns a Way given an id, or null if no such Way exists. */
     public Way getWayById(long id) {
-        return ways.stream().filter(w -> w.getId() == id).findAny().orElse(null);
+        return ways.get(id);
     }
 
     /** Adds a new Way to the list of Ways. */
     public void addWay(Way newWay) {
-        this.ways.add(newWay);
+        ways.put(newWay.getId(), newWay);
     }
 
     /** Removes a Way by id, or does nothing if such a Way doesn't exist. */
     public void removeWayById(long id) {
-        ways.removeIf(w -> w.getId() == id);
+        ways.remove(id);
     }
 
     /** Clears the list of Ways. */
@@ -178,7 +177,7 @@ public class OSM {
     /** Shrinks the bounding box as necessary to fully contain all nodes exactly. */
     public void adjustNodeBounds() {
         nodeBoundingBox = null;
-        for (Node n : nodes) {
+        for (Node n : nodes.values()) {
             adjustBoundsIfNecessary(n);
         }
     }
