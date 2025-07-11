@@ -23,9 +23,11 @@ public class CompiledPolyline extends CompiledGeometry {
     }
 
     public void render(Graphics2D g2d, Scaler scaler) {
-        g2d.setColor(style.getStroke());
+
+        // Create a new GeneralPath, which will be the path traced out by the polyline
         GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, points.size());
 
+        // Go from one point to the next
         for (int i = 0; i < points.size(); ++i) {
             ProjectedCoordinate rawCoordinate = points.get(i);
             ScaledCoordinate coordinate = scaler.scale(rawCoordinate);
@@ -37,6 +39,17 @@ public class CompiledPolyline extends CompiledGeometry {
             }
         }
 
-        g2d.draw(polyline);
+        // If there is a fill, do that first
+        if (style.getFill() != null) {
+            polyline.closePath();
+            g2d.setColor(style.getFill());
+            g2d.fill(polyline);
+        }
+
+        // If there is a stroke, do that
+        if (style.getStroke() != null) {
+            g2d.setColor(style.getStroke());
+            g2d.draw(polyline);
+        }
     }
 }

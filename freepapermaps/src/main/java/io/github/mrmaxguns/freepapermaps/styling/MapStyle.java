@@ -102,7 +102,7 @@ public class MapStyle {
         // Draw all ways
         WaySelector waySelector = new WaySelector("ways");
         style.addWaySelector(waySelector);
-        style.addWayLayer(new PolylineLayer("ways", null));
+        style.addWayLayer(new PolylineLayer("ways", null, null));
 
         return style;
     }

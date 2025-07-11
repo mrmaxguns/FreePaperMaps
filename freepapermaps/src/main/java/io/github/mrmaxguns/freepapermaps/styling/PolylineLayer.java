@@ -15,14 +15,22 @@ import java.awt.*;
 
 /** A PolylineLayer operates on Way geometry and compiles to a CompiledPolyline. */
 public class PolylineLayer extends Layer<Way> {
-    /** The default stroke value. */
+    /** This is used only if neither a fill nor stroke is specified. */
     public final static Color DEFAULT_STROKE = Color.BLACK;
     /** The stroke of a polyline is the color of the line itself. */
     private Color stroke;
+    /** The fill of a polyline is the color within the polygon traced out by the polyline. If null, no fill is
+     * applied. */
+    private Color fill;
 
-    public PolylineLayer(String ref, Color stroke) {
+    public PolylineLayer(String ref, Color stroke, Color fill) {
         super(ref);
-        setStroke(stroke);
+        this.stroke = stroke;
+        this.fill = fill;
+
+        if (stroke == null && fill == null) {
+            this.stroke = DEFAULT_STROKE;
+        }
     }
 
     /** Constructs a new PolylineLayer from a node found in an XML style file. */
@@ -34,7 +42,10 @@ public class PolylineLayer extends Layer<Way> {
         String rawStroke = xmlTools.getOptionalAttributeValue(rawNode, "stroke");
         Color stroke = rawStroke != null ? MapStyle.parseColor(rawStroke) : null;
 
-        return new PolylineLayer(ref, stroke);
+        String rawFill = xmlTools.getOptionalAttributeValue(rawNode, "fill");
+        Color fill = rawFill != null ? MapStyle.parseColor(rawFill) : null;
+
+        return new PolylineLayer(ref, stroke, fill);
     }
 
     public CompiledGeometry compile(Way way, OSM mapData, Projection projection) throws UserInputException {
@@ -52,6 +63,23 @@ public class PolylineLayer extends Layer<Way> {
     }
 
     public void setStroke(Color stroke) {
-        this.stroke = stroke != null ? stroke : DEFAULT_STROKE;
+        if (fill == null && stroke == null) {
+            this.stroke = DEFAULT_STROKE;
+        } else {
+            this.stroke = stroke;
+        }
+    }
+
+    public Color getFill() {
+        return fill;
+    }
+
+    public void setFill(Color fill) {
+        if (fill == null && stroke == null) {
+            this.fill = null;
+            stroke = DEFAULT_STROKE;
+        } else {
+            this.fill = fill;
+        }
     }
 }
