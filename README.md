@@ -85,6 +85,7 @@ This project is a work in progress. Breaking changes in every commit!
 Before first "release":
 
 - OSM copyright notice
+- Don't render invisible attributes
 - Tests
 - Simple shapes for nodes
 - Way width adjustment
