@@ -94,6 +94,9 @@ Mapnik. Lightweight. Built from the ground up.
 
 This project is a work in progress. Breaking changes in every commit!
 
+**Map data in example maps is from [OpenStreetMap](https://www.openstreetmap.org/copyright/) and is
+licensed under the Open Database License.**
+
 ## Features
 
 - Parses OSM data
