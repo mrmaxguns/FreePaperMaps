@@ -102,11 +102,12 @@ public class MapStyle {
         // Draw all ways
         WaySelector waySelector = new WaySelector("ways");
         style.addWaySelector(waySelector);
-        style.addWayLayer(new PolylineLayer("ways", null, null));
+        style.addWayLayer(new PolylineLayer("ways", null, null, null));
 
         return style;
     }
 
+    // TODO: Move the parse functions to a utility class
     /** Returns a Color parsed from colorName, which should be a 24-bit integer representation. */
     public static Color parseColor(String colorName) throws UserInputException {
         try {
@@ -114,6 +115,16 @@ public class MapStyle {
         } catch (NumberFormatException e) {
             throw new UserInputException("Invalid color '" + colorName + "'.");
         }
+    }
+
+    public static Stroke parseStroke(String rawThickness) throws UserInputException {
+        float thickness;
+        try {
+            thickness = Float.parseFloat(rawThickness);
+        } catch (NumberFormatException e) {
+            throw new UserInputException("Invalid thickness value '" + rawThickness + "'.");
+        }
+        return new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     }
 
     // nodeSelectors

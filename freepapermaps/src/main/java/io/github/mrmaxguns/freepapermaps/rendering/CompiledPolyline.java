@@ -23,7 +23,6 @@ public class CompiledPolyline extends CompiledGeometry {
     }
 
     public void render(Graphics2D g2d, Scaler scaler) {
-
         // Create a new GeneralPath, which will be the path traced out by the polyline
         GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, points.size());
 
@@ -37,6 +36,13 @@ public class CompiledPolyline extends CompiledGeometry {
             } else {
                 polyline.lineTo(coordinate.getX(), coordinate.getY());
             }
+        }
+
+        // Set stroke properties
+        if (style.getStrokeProperties() != null) {
+            g2d.setStroke(style.getStrokeProperties());
+        } else {
+            g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         }
 
         // If there is a fill, do that first

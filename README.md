@@ -88,7 +88,6 @@ Before first "release":
 - Don't render invisible attributes
 - Tests
 - Simple shapes for nodes
-- Way width adjustment
 
 Future:
 
