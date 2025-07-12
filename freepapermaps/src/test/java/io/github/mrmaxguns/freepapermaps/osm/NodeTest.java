@@ -65,7 +65,7 @@ public class NodeTest {
 
     @Test
     public void testFromXMLMissingRequiredAttribute() throws Exception {
-        String[] attrs = {"lon", "lat"};
+        String[] attrs = { "id", "lon", "lat" };
         for (String attr : attrs) {
             org.w3c.dom.Node node = loadXMLNodeFromString(VALID_XML);
             node.getAttributes().removeNamedItem(attr);

@@ -5,6 +5,8 @@ import io.github.mrmaxguns.freepapermaps.XMLTools;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 /** Represents an OSM way: an ordered list of Node IDs. */
 public class Way {
@@ -74,7 +76,7 @@ public class Way {
         this.visible = visible;
     }
 
-    public ArrayList<Long> getNodeIds() {
+    public List<Long> getNodeIds() {
         return nodeIds;
     }
 
