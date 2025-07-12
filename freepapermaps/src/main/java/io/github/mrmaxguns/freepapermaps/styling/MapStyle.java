@@ -75,7 +75,7 @@ public class MapStyle {
             switch (selector.getNodeName()) {
             case "node" -> style.addNodeSelector(NodeSelector.fromXML(selector));
             case "way" -> style.addWaySelector(WaySelector.fromXML(selector));
-            case "#text" -> {}
+                case "#text", "#comment" -> {}
             default -> throw new UserInputException("Undefined selector '" + selector.getNodeName() + "'.");
             }
         }
@@ -87,7 +87,7 @@ public class MapStyle {
 
             switch (rawLayer.getNodeName()) {
             case "polyline" -> style.addWayLayer(PolylineLayer.fromXML(rawLayer));
-            case "#text" -> {}
+                case "#text", "#comment" -> {}
             default -> throw new UserInputException("Undefined layer type '" + rawLayer.getNodeName() + "'.");
             }
         }
