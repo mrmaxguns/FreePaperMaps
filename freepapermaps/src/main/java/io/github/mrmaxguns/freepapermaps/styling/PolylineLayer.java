@@ -22,11 +22,14 @@ public class PolylineLayer extends Layer<Way> {
     /** The fill of a polyline is the color within the polygon traced out by the polyline. If null, no fill is
      * applied. */
     private Color fill;
+    /** Rendering attributes for the line. If null, no BasicStroke is applied during rendering. */
+    private Stroke strokeProperties;
 
-    public PolylineLayer(String ref, Color stroke, Color fill) {
+    public PolylineLayer(String ref, Color stroke, Color fill, Stroke strokeProperties) {
         super(ref);
         this.stroke = stroke;
         this.fill = fill;
+        this.strokeProperties = strokeProperties;
 
         if (stroke == null && fill == null) {
             this.stroke = DEFAULT_STROKE;
@@ -45,7 +48,10 @@ public class PolylineLayer extends Layer<Way> {
         String rawFill = xmlTools.getOptionalAttributeValue(rawNode, "fill");
         Color fill = rawFill != null ? MapStyle.parseColor(rawFill) : null;
 
-        return new PolylineLayer(ref, stroke, fill);
+        String thickness = xmlTools.getOptionalAttributeValue(rawNode, "thickness");
+        Stroke strokeProperties = thickness != null ? MapStyle.parseStroke(thickness) : null;
+
+        return new PolylineLayer(ref, stroke, fill, strokeProperties);
     }
 
     public CompiledGeometry compile(Way way, OSM mapData, Projection projection) throws UserInputException {
@@ -81,5 +87,13 @@ public class PolylineLayer extends Layer<Way> {
         } else {
             this.fill = fill;
         }
+    }
+
+    public Stroke getStrokeProperties() {
+        return strokeProperties;
+    }
+
+    public void setStrokeProperties(Stroke strokeProperties) {
+        this.strokeProperties = strokeProperties;
     }
 }
