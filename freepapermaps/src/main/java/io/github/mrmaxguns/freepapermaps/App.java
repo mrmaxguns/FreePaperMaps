@@ -124,7 +124,7 @@ public class App {
         // Create the projection so that the origin is the top-left-most point (even if the point is outside our final
         // bounding box).
         WGS84Coordinate origin = mapData.getNodeBoundingBox().getTopLeftCorner();
-        Projection projection = new PseudoMercatorProjection(new WGS84Coordinate(origin.getLon(), origin.getLat()));
+        Projection projection = new PseudoMercatorProjection(origin);
 
         // Create a scaler based on user options. The scaler is based on the final bounding box, since that is what's
         // returned to the user.
