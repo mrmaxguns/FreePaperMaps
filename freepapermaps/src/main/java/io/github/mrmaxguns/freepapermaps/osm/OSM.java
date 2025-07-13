@@ -5,6 +5,7 @@ import io.github.mrmaxguns.freepapermaps.XMLTools;
 import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class OSM {
         // Get map bounds
         BoundingBox<WGS84Coordinate> boundingBox = null;
 
-        org.w3c.dom.Node bounds = xmlTools.getSingleTag(doc, "bounds");
+        Element bounds = xmlTools.getSingleChildElementByTagName(doc, "bounds");
         double minLat = xmlTools.getAttributeValueDouble(bounds, "minlat");
         double minLon = xmlTools.getAttributeValueDouble(bounds, "minlon");
         double maxLat = xmlTools.getAttributeValueDouble(bounds, "maxlat");

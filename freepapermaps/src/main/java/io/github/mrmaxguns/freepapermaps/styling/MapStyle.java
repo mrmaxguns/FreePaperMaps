@@ -69,7 +69,7 @@ public class MapStyle {
         MapStyle style = new MapStyle(backgroundColor);
 
         // Parse selectors
-        NodeList selectors = xmlTools.getSingleTag(doc, "selectors").getChildNodes();
+        NodeList selectors = xmlTools.getSingleChildElementByTagName(doc, "selectors").getChildNodes();
         for (int i = 0; i < selectors.getLength(); ++i) {
             org.w3c.dom.Node selector = selectors.item(i);
             switch (selector.getNodeName()) {
@@ -81,7 +81,7 @@ public class MapStyle {
         }
 
         // Parse layers
-        NodeList layers = xmlTools.getSingleTag(doc, "layers").getChildNodes();
+        NodeList layers = xmlTools.getSingleChildElementByTagName(doc, "layers").getChildNodes();
         for (int i = 0; i < layers.getLength(); ++i) {
             org.w3c.dom.Node rawLayer = layers.item(i);
 
