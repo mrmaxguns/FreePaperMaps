@@ -174,6 +174,7 @@ licensed under the Open Database License.**
 
 Before first "release":
 
+- Refactor to use `Element` instead of `Node` where semantically accurate
 - OSM copyright notice
 - Don't render invisible attributes
 - Tests
@@ -181,6 +182,7 @@ Before first "release":
 
 Future:
 
+- Allow processing OSM data from Overpass queries
 - Arbitrary projections with `proj`
 - SVG icons for nodes/ways
 - Text/label support
