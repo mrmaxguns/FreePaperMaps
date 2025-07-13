@@ -3,6 +3,7 @@ package io.github.mrmaxguns.freepapermaps.osm;
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.XMLTools;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.Objects;
@@ -10,14 +11,14 @@ import java.util.Objects;
 
 /** Represents an OSM node, which is a point in space that optionally has tags. */
 public class Node {
-    /** The Node's unique identifier in the database. */
-    private long id;
-    /** The Node's position in the world. Never null. */
-    private WGS84Coordinate position;
-    /** Whether the Node should be rendered. */
-    private boolean visible;
     /** A list of tags associated with this Node. */
     private final TagList tags;
+    /** The <code>Node</code>'s unique identifier in the database. */
+    private long id;
+    /** The <code>Node</code>'s position in the world. Never <code>null</code>. */
+    private WGS84Coordinate position;
+    /** Whether the <code>Node</code> should be rendered. */
+    private boolean visible;
 
     /** Constructs a new Node. */
     public Node(long id, WGS84Coordinate position, boolean visible) {
@@ -27,18 +28,26 @@ public class Node {
         this.tags = new TagList();
     }
 
-    /** Constructs a Node from an org.w3c.dom XML Node. */
-    public static Node fromXML(org.w3c.dom.Node rawNode) throws UserInputException {
-        XMLTools xmlTools = new XMLTools();
+    /** Constructs a Node from an org.w3c.dom XML Element. */
+    public static Node fromXML(Element rawNode) throws UserInputException {
+        return fromXML(rawNode, new XMLTools());
+    }
 
-        long id = xmlTools.getAttributeValueLong(rawNode, "id");
+    /**
+     * Constructs a Node from an org.w3c.dom XML Element, with an XML context provided by an <code>XMLTools</code>
+     * object.
+     */
+    public static Node fromXML(Element rawNode, XMLTools xmlTools) throws UserInputException {
+        long id = xmlTools.getRequiredAttributeValueLong(rawNode, "id");
 
-        double lon = xmlTools.getAttributeValueDouble(rawNode, "lon");
-        double lat = xmlTools.getAttributeValueDouble(rawNode, "lat");
+        // Get position
+        double lon = xmlTools.getRequiredAttributeValueDouble(rawNode, "lon");
+        double lat = xmlTools.getRequiredAttributeValueDouble(rawNode, "lat");
         WGS84Coordinate position = new WGS84Coordinate(lon, lat);
 
+        // Get optional attribute visible
         boolean visible = true;
-        String visibleRaw = xmlTools.getOptionalAttributeValue(rawNode, "visible");
+        String visibleRaw = xmlTools.getAttributeValue(rawNode, "visible", false);
         if (visibleRaw != null) {
             visible = Boolean.parseBoolean(visibleRaw);
         }
@@ -46,7 +55,7 @@ public class Node {
         Node newNode = new Node(id, position, visible);
 
         NodeList tags = rawNode.getChildNodes();
-        newNode.getTags().insertFromXML(tags);
+        newNode.getTags().insertFromXML(tags, xmlTools);
 
         return newNode;
     }
@@ -64,7 +73,7 @@ public class Node {
     }
 
     public void setPosition(WGS84Coordinate position) {
-        this.position = position;
+        this.position = Objects.requireNonNull(position);
     }
 
     public boolean isVisible() {

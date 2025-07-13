@@ -112,13 +112,13 @@ public class App {
                                   double scale, ScaleOption scaleOption)
             throws ParserConfigurationException, UserInputException, SVGGraphics2DIOException  {
         // Gather necessary resources
-        OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)));
+        OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)), new XMLTools(inputFileName));
 
         MapStyle mapStyle;
         if (styleFileName != null) {
-            mapStyle = MapStyle.fromXML(openXMLFile(styleFileName));
+            mapStyle = MapStyle.fromXML(openXMLFile(styleFileName), new XMLTools(styleFileName));
         } else {
-            mapStyle = MapStyle.defaultMapStyle();
+            mapStyle = MapStyle.debugMapStyle();
         }
 
         // Create the projection so that the origin is the top-left-most point (even if the point is outside our final

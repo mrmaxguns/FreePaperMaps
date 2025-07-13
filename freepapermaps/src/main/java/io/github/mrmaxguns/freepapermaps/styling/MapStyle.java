@@ -9,11 +9,13 @@ import io.github.mrmaxguns.freepapermaps.projections.Projection;
 import io.github.mrmaxguns.freepapermaps.rendering.CompiledMap;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 /**
@@ -21,8 +23,6 @@ import java.util.HashMap;
  * produce a CompiledMap.
  */
 public class MapStyle {
-    /** The default background color, when left unspecified. */
-    public final static Color DEFAULT_BACKGROUND_COLOR = Color.LIGHT_GRAY;
     /** An ordered list of all selectors that apply to Nodes. */
     private final HashMap<String, NodeSelector> nodeSelectors;
     /** An ordered list of all selectors that apply to Ways. */
@@ -33,12 +33,20 @@ public class MapStyle {
     private final ArrayList<Layer<Way>> wayLayers;
     /** An ordered list of TaggedLayers, keeping track of all Node and Way layers. */
     private final ArrayList<TaggedLayer> orderedLayers;
-    /** The background color of the map, which is a layer of fill applied before all other layers. */
+    /**
+     * The background color of the map, which is a layer of fill applied before all other layers. Can be
+     * <code>null</code>.
+     */
     private Color backgroundColor;
 
-    /** Constructs a new MapStyle. */
+    /** Constructs a new <code>MapStyle</code>. */
+    public MapStyle() {
+        this(null);
+    }
+
+    /** Constructs a new <code>MapStyle</code> with global options. */
     public MapStyle(Color backgroundColor) {
-        this.backgroundColor = backgroundColor != null ? backgroundColor : DEFAULT_BACKGROUND_COLOR;
+        this.backgroundColor = backgroundColor;
         this.nodeSelectors = new HashMap<>();
         this.waySelectors = new HashMap<>();
         this.nodeLayers = new ArrayList<>();
@@ -46,21 +54,21 @@ public class MapStyle {
         this.orderedLayers = new ArrayList<>();
     }
 
-    /** Constructs a new MapStyle from an XML "styling" document specific to FreePaperMaps. */
     public static MapStyle fromXML(Document doc) throws UserInputException {
-        XMLTools xmlTools = new XMLTools("Map Style File");
+        return fromXML(doc, new XMLTools());
+    }
 
+    /** Constructs a new MapStyle from an XML "styling" document specific to FreePaperMaps. */
+    public static MapStyle fromXML(Document doc, XMLTools xmlTools) throws UserInputException {
         // Parse global settings
-        NodeList settings = doc.getElementsByTagName("setting");
+        java.util.List<Element> settings = xmlTools.getDirectChildElementsByTagName(doc, "setting");
         Color backgroundColor = null;
-        for (int i = 0; i < settings.getLength(); ++i) {
-            org.w3c.dom.Node setting = settings.item(i);
-
+        for (Element setting : settings) {
             String key = xmlTools.getAttributeValue(setting, "k");
             String val = xmlTools.getAttributeValue(setting, "v");
 
             switch (key) {
-            case "background-color" -> backgroundColor = parseColor(val);
+                case "background-color" -> backgroundColor = xmlTools.parseColor(val);
             default -> throw new UserInputException("Unknown setting '" + key + "'.");
             }
         }
@@ -71,24 +79,27 @@ public class MapStyle {
         // Parse selectors
         NodeList selectors = xmlTools.getSingleChildElementByTagName(doc, "selectors").getChildNodes();
         for (int i = 0; i < selectors.getLength(); ++i) {
-            org.w3c.dom.Node selector = selectors.item(i);
-            switch (selector.getNodeName()) {
-            case "node" -> style.addNodeSelector(NodeSelector.fromXML(selector));
-            case "way" -> style.addWaySelector(WaySelector.fromXML(selector));
-                case "#text", "#comment" -> {}
-            default -> throw new UserInputException("Undefined selector '" + selector.getNodeName() + "'.");
+            if (selectors.item(i).getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
+                continue;
+            }
+            Element selector = (Element) selectors.item(i);
+            switch (selector.getTagName()) {
+                case "node" -> style.addNodeSelector(NodeSelector.fromXML(selector, xmlTools));
+                case "way" -> style.addWaySelector(WaySelector.fromXML(selector, xmlTools));
+                default -> throw new UserInputException("Undefined selector '" + selector.getTagName() + "'.");
             }
         }
 
         // Parse layers
         NodeList layers = xmlTools.getSingleChildElementByTagName(doc, "layers").getChildNodes();
         for (int i = 0; i < layers.getLength(); ++i) {
-            org.w3c.dom.Node rawLayer = layers.item(i);
-
-            switch (rawLayer.getNodeName()) {
-            case "polyline" -> style.addWayLayer(PolylineLayer.fromXML(rawLayer));
-                case "#text", "#comment" -> {}
-            default -> throw new UserInputException("Undefined layer type '" + rawLayer.getNodeName() + "'.");
+            if (layers.item(i).getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
+                continue;
+            }
+            Element layer = (Element) layers.item(i);
+            switch (layer.getTagName()) {
+                case "polyline" -> style.addWayLayer(PolylineLayer.fromXML(layer, xmlTools));
+                default -> throw new UserInputException("Undefined layer type '" + layer.getTagName() + "'.");
             }
         }
 
@@ -96,7 +107,7 @@ public class MapStyle {
     }
 
     /** Constructs a minimal map style to use for debugging. */
-    public static MapStyle defaultMapStyle() {
+    public static MapStyle debugMapStyle() {
         MapStyle style = new MapStyle(null);
 
         // Draw all ways
@@ -105,26 +116,6 @@ public class MapStyle {
         style.addWayLayer(new PolylineLayer("ways", null, null, null));
 
         return style;
-    }
-
-    // TODO: Move the parse functions to a utility class
-    /** Returns a Color parsed from colorName, which should be a 24-bit integer representation. */
-    public static Color parseColor(String colorName) throws UserInputException {
-        try {
-            return Color.decode(colorName);
-        } catch (NumberFormatException e) {
-            throw new UserInputException("Invalid color '" + colorName + "'.");
-        }
-    }
-
-    public static Stroke parseStroke(String rawThickness) throws UserInputException {
-        float thickness;
-        try {
-            thickness = Float.parseFloat(rawThickness);
-        } catch (NumberFormatException e) {
-            throw new UserInputException("Invalid thickness value '" + rawThickness + "'.");
-        }
-        return new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     }
 
     // nodeSelectors
@@ -137,7 +128,7 @@ public class MapStyle {
     }
 
     public void addNodeSelector(NodeSelector newNodeSelector) {
-        nodeSelectors.put(newNodeSelector.getId(), newNodeSelector);
+        nodeSelectors.put(newNodeSelector.getId(), Objects.requireNonNull(newNodeSelector));
     }
 
     public void removeNodeSelectorById(String id) {
@@ -158,7 +149,7 @@ public class MapStyle {
     }
 
     public void addWaySelector(WaySelector newWaySelector) {
-        waySelectors.put(newWaySelector.getId(), newWaySelector);
+        waySelectors.put(newWaySelector.getId(), Objects.requireNonNull(newWaySelector));
     }
 
     public void removeWaySelectorById(String id) {
@@ -171,13 +162,13 @@ public class MapStyle {
 
     // nodeLayers
     public void addNodeLayer(Layer<Node> layer) {
-        nodeLayers.add(layer);
+        nodeLayers.add(Objects.requireNonNull(layer));
         orderedLayers.add(new TaggedLayer(TaggedLayer.Type.Node, nodeLayers.size() - 1));
     }
 
     // wayLayers
     public void addWayLayer(Layer<Way> layer) {
-        wayLayers.add(layer);
+        wayLayers.add(Objects.requireNonNull(layer));
         orderedLayers.add(new TaggedLayer(TaggedLayer.Type.Way, wayLayers.size() - 1));
     }
 

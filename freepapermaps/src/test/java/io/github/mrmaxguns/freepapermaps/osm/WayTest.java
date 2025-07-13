@@ -2,10 +2,11 @@ package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
 
 import java.util.List;
 
-import static io.github.mrmaxguns.freepapermaps.TestingUtility.loadXMLNodeFromString;
+import static io.github.mrmaxguns.freepapermaps.TestingUtility.loadXMLElementFromString;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -29,7 +30,7 @@ public class WayTest {
     private final Way validWay;
 
     public WayTest() throws Exception {
-        org.w3c.dom.Node validXMLNode = loadXMLNodeFromString(VALID_XML);
+        Element validXMLNode = loadXMLElementFromString(VALID_XML);
         validWay = Way.fromXML(validXMLNode);
     }
 
@@ -71,7 +72,7 @@ public class WayTest {
 
     @Test
     public void testFromXMLMissingRequiredAttribute() throws Exception {
-        org.w3c.dom.Node node = loadXMLNodeFromString(VALID_XML);
+        Element node = loadXMLElementFromString(VALID_XML);
         node.getAttributes().removeNamedItem("id");
         assertThrows(UserInputException.class, () -> Node.fromXML(node),
                      "missing required attribute id should cause an error");
@@ -79,7 +80,7 @@ public class WayTest {
 
     @Test
     public void testFromXMLMissingOptionalAttribute() throws Exception {
-        org.w3c.dom.Node node = loadXMLNodeFromString(VALID_XML);
+        Element node = loadXMLElementFromString(VALID_XML);
         node.getAttributes().removeNamedItem("visible");
         Way result = Way.fromXML(node);
         assertTrue(result.isVisible(), "a node without optional visibility attribute should default to visible");

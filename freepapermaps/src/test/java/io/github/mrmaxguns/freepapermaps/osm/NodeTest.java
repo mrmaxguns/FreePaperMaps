@@ -3,8 +3,9 @@ package io.github.mrmaxguns.freepapermaps.osm;
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
 
-import static io.github.mrmaxguns.freepapermaps.TestingUtility.loadXMLNodeFromString;
+import static io.github.mrmaxguns.freepapermaps.TestingUtility.loadXMLElementFromString;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeTest {
@@ -23,7 +24,7 @@ public class NodeTest {
     private final Node validNode;
 
     public NodeTest() throws Exception {
-        org.w3c.dom.Node validXMLNode = loadXMLNodeFromString(VALID_XML);
+        Element validXMLNode = loadXMLElementFromString(VALID_XML);
         validNode = Node.fromXML(validXMLNode);
     }
 
@@ -67,7 +68,7 @@ public class NodeTest {
     public void testFromXMLMissingRequiredAttribute() throws Exception {
         String[] attrs = { "id", "lon", "lat" };
         for (String attr : attrs) {
-            org.w3c.dom.Node node = loadXMLNodeFromString(VALID_XML);
+            Element node = loadXMLElementFromString(VALID_XML);
             node.getAttributes().removeNamedItem(attr);
             assertThrows(UserInputException.class, () -> Node.fromXML(node),
                     "missing required attribute " + attr + " should cause an error");
@@ -76,7 +77,7 @@ public class NodeTest {
 
     @Test
     public void testFromXMLMissingOptionalAttribute() throws Exception {
-        org.w3c.dom.Node node = loadXMLNodeFromString(VALID_XML);
+        Element node = loadXMLElementFromString(VALID_XML);
         node.getAttributes().removeNamedItem("visible");
         Node result = Node.fromXML(node);
         assertTrue(result.isVisible(), "a node without optional visibility attribute should default to visible");

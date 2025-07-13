@@ -174,7 +174,6 @@ licensed under the Open Database License.**
 
 Before first "release":
 
-- Refactor to use `Element` instead of `Node` where semantically accurate
 - OSM copyright notice
 - Don't render invisible attributes
 - Tests

@@ -5,6 +5,8 @@ import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.projections.Projection;
 import io.github.mrmaxguns.freepapermaps.rendering.CompiledGeometry;
 
+import java.util.Objects;
+
 
 /**
  * A Layer applies to a certain type of OSM geometry: a Node or Way, and this relationship is enforced with type
@@ -12,11 +14,11 @@ import io.github.mrmaxguns.freepapermaps.rendering.CompiledGeometry;
  * geometry which the layer uses, the layer itself encodes styling information used to actually render the geometry.
  */
 public abstract class Layer<T> {
-    /** A reference to this layer's selector. */
+    /** A reference to this layer's selector. Never <code>null</code>. */
     protected String ref;
 
     public Layer(String ref) {
-        this.ref = ref;
+        this.ref = Objects.requireNonNull(ref);
     }
 
     /**
@@ -30,6 +32,6 @@ public abstract class Layer<T> {
     }
 
     public void setRef(String ref) {
-        this.ref = ref;
+        this.ref = Objects.requireNonNull(ref);
     }
 }

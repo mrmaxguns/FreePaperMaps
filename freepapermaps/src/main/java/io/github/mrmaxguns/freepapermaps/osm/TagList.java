@@ -2,20 +2,31 @@ package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.XMLTools;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/** Represents a collection of tags associated with a Node, Way, or Relation. */
+
+/**
+ * Represents a collection of tags associated with a Node, Way, or Relation. Permits <code>null</code> keys and
+ * values.
+ */
 public class TagList extends HashMap<String, String> {
     public void insertFromXML(NodeList tags) throws UserInputException {
-        XMLTools xmlTools = new XMLTools();
+        insertFromXML(tags, new XMLTools());
+    }
 
+    public void insertFromXML(NodeList tags, XMLTools xmlTools) throws UserInputException {
         for (int i = 0; i < tags.getLength(); ++i) {
-            Node tag = tags.item(i);
-            if (tag.getNodeName().equals("tag")) {
+            if (tags.item(i).getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            Element tag = (Element) tags.item(i);
+            if (tag.getTagName().equals("tag")) {
                 put(xmlTools.getAttributeValue(tag, "k"), xmlTools.getAttributeValue(tag, "v"));
             }
         }

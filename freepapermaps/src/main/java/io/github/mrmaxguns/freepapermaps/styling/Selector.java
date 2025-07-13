@@ -2,6 +2,8 @@ package io.github.mrmaxguns.freepapermaps.styling;
 
 import io.github.mrmaxguns.freepapermaps.osm.TagList;
 
+import java.util.Objects;
+
 
 /**
  * A Selector is used to specify the geometry that a given layer applies to. Currently, Selectors are only capable of
@@ -11,11 +13,11 @@ import io.github.mrmaxguns.freepapermaps.osm.TagList;
 public abstract class Selector<T> {
     /** A list of tags that a geometry element must have to be considered "matching." */
     private final TagList tags;
-    /** A unique identifier for the selector, so that a layer can refer to it. */
+    /** A unique identifier for the selector, so that a layer can refer to it. Never <code>null</code>. */
     private String id;
 
     public Selector(String id) {
-        this.id = id;
+        this.id = Objects.requireNonNull(id);
         this.tags = new TagList();
     }
 
@@ -27,7 +29,7 @@ public abstract class Selector<T> {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = Objects.requireNonNull(id);
     }
 
     public TagList getTags() {

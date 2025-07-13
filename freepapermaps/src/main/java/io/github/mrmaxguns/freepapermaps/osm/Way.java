@@ -2,13 +2,16 @@ package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.XMLTools;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
-/** Represents an OSM way: an ordered list of Node IDs. */
+/** Represents an OSM way, which is an ordered list of node ids. */
 public class Way {
     /** The Way's unique identifier. */
     private long id;
@@ -28,13 +31,20 @@ public class Way {
     }
 
     /** Constructs a Way object from an org.w3c.dom XML Node. */
-    public static Way fromXML(org.w3c.dom.Node rawNode) throws UserInputException {
-        XMLTools xmlTools = new XMLTools();
+    public static Way fromXML(Element rawWay) throws UserInputException {
+        return fromXML(rawWay, new XMLTools());
+    }
 
-        long id = xmlTools.getAttributeValueLong(rawNode, "id");
+    /**
+     * Constructs a Way object from an org.w3c.dom XML Node, with an XML context provided by an <code>XMLTools</code>
+     * object.
+     */
+    public static Way fromXML(Element rawWay, XMLTools xmlTools) throws UserInputException {
+        long id = xmlTools.getRequiredAttributeValueLong(rawWay, "id");
 
+        // Get optional visibility attribute
         boolean visible = true;
-        String visibleRaw = xmlTools.getOptionalAttributeValue(rawNode, "visible");
+        String visibleRaw = xmlTools.getAttributeValue(rawWay, "visible", false);
         if (visibleRaw != null) {
             visible = Boolean.parseBoolean(visibleRaw);
         }
@@ -43,13 +53,17 @@ public class Way {
 
         // A way's children are usually both node references and tags. To speed up the process, we will collect both
         // nodes and tags in one iteration rather than calling TagList's insertFromXML.
-        NodeList children = rawNode.getChildNodes();
+        NodeList children = rawWay.getChildNodes();
         for (int i = 0; i < children.getLength(); ++i) {
-            org.w3c.dom.Node child = children.item(i);
-            if (child.getNodeName().equals("nd")) {
+            if (children.item(i).getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            Element child = (Element) children.item(i);
+            if (child.getTagName().equals("nd")) {
                 // Parse node references
-                newWay.getNodeIds().add(xmlTools.getAttributeValueLong(child, "ref"));
-            } else if (child.getNodeName().equals("tag")) {
+                newWay.addNodeId(xmlTools.getRequiredAttributeValueLong(child, "ref"));
+            } else if (child.getTagName().equals("tag")) {
                 // Parse tags
                 newWay.getTags().put(
                         xmlTools.getAttributeValue(child, "k"),
@@ -76,8 +90,19 @@ public class Way {
         this.visible = visible;
     }
 
+    /** Returns an unmodifiable list of <code>Node</code> ids. */
     public List<Long> getNodeIds() {
-        return nodeIds;
+        return Collections.unmodifiableList(nodeIds);
+    }
+
+    /** Adds a <code>Node</code> id to the end of the list. */
+    public void addNodeId(long id) {
+        nodeIds.add(id);
+    }
+
+    /** Clears the list of <code>Node</code> ids. */
+    public void clearNodeIds() {
+        nodeIds.clear();
     }
 
     public TagList getTags() {

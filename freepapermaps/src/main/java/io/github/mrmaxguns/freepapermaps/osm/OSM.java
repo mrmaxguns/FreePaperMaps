@@ -11,45 +11,53 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
- * OSM is a representation of the OpenStreetMap data format. There are three fundamental building blocks for geographic
- * data in this format:
+ * <code>OSM</code> is a representation of the OpenStreetMap data format. There are three fundamental building blocks
+ * for geographic data in this format:
  * <ul>
- *     <li><em>Node:</em> a point associated with a position in space</li>
- *     <li><em>Way:</em> an ordered list of nodes</li>
- *     <li><em>Relation:</em> an ordered list of nodes, ways, and other relations</li>
+ *     <li><em>Node:</em> a point associated with a position in space. See <a href="#{@link}>{@link Node}</a>.</li>
+ *     <li><em>Way:</em> an ordered list of nodes. See <a href="#{@link}>{@link Way}</a>.</li>
+ *     <li><em>Relation:</em> an ordered list of nodes, ways, and other relations. (Not implemented yet.)</li>
  * </ul>
- * See also <a href="https://wiki.openstreetmap.org/wiki/Elements">the OSM wiki</a>.
+ * See also <a href="https://wiki.openstreetmap.org/wiki/Elements">the OSM wiki</a>. Currently, only nodes and ways
+ * are supported.
  * <p>
- * All three elements can also have tags, which are key/value pairs describing the element in question.
+ * All three elements can also have tags (see <a href="#{@link}>{@link TagList}</a>), which are key/value pairs
+ * describing the element in question.
  * <p>
- * The OSM class represents a complete region of OpenStreetMap data. It provides utilities for adding and modifying the
+ * This class represents a complete region of OpenStreetMap data. It provides utilities for adding and modifying the
  * data. Additionally, it provides utilities for parsing OSM data from an OSM XML file.
- * */
+ */
 public class OSM {
+    /** A list of nodes, where keys are node ids for fast access. */
+    private final HashMap<Long, Node> nodes;
+    /** A list of ways, where keys are way ids for fast access. */
+    private final HashMap<Long, Way> ways;
     /** A bounding box defining the geographic area to be rendered. Can be null. */
     private BoundingBox<WGS84Coordinate> boundingBox;
-
-    /** A list of nodes. */
-    private final HashMap<Long, Node> nodes;
-    /** A list of ways. */
-    private final HashMap<Long, Way> ways;
-
     /**
      * A bounding box defining an area containing all nodes. When exporting a region from OpenStreetMap, the region's
      * size will be given by <code>boundingBox</code>, but in reality, there will be nodes outside that area if any
      * geometry was "cut" by the region.
      * <p>
-     * Invariant: nodeBoundingBox is always at least large enough to display all data nodes, and is null when there are no nodes
+     * Invariant: nodeBoundingBox is always at least large enough to display all data nodes, and is null when there are
+     * no nodes.
      */
     private BoundingBox<WGS84Coordinate> nodeBoundingBox;
 
+    /** Constructs an OSM object with a <code>null</code> <code>boundingBox</code>. */
+    public OSM() {
+        this(null);
+    }
+
     /**
      * Constructs an OSM object.
+     *
      * @param boundingBox a geographic region representing the rendering extent (typically given by minlat, minlon,
-     *                    maxlat, and maxlon in an OSM XML file. Can be null.
+     *                    maxlat, and maxlon in an OSM XML file). Can be null.
      */
     public OSM(BoundingBox<WGS84Coordinate> boundingBox) {
         this.boundingBox = boundingBox;
@@ -60,17 +68,27 @@ public class OSM {
 
     /** Constructs an OSM object from an OSM XML file. */
     public static OSM fromXML(Document doc) throws UserInputException {
-        XMLTools xmlTools = new XMLTools("OSM Data File");
+        return fromXML(doc, new XMLTools());
+    }
 
+    /**
+     * Constructs an OSM object from an OSM XML file, with the addition of an <code>XMLTools</code> object to provide
+     * useful context for user error messages.
+     */
+    public static OSM fromXML(Document doc, XMLTools xmlTools) throws UserInputException {
         // Get map bounds
-        BoundingBox<WGS84Coordinate> boundingBox = null;
+        Element bounds = xmlTools.getSingleChildElementByTagName(doc, "bounds", false);
+        BoundingBox<WGS84Coordinate> boundingBox;
 
-        Element bounds = xmlTools.getSingleChildElementByTagName(doc, "bounds");
-        double minLat = xmlTools.getAttributeValueDouble(bounds, "minlat");
-        double minLon = xmlTools.getAttributeValueDouble(bounds, "minlon");
-        double maxLat = xmlTools.getAttributeValueDouble(bounds, "maxlat");
-        double maxLon = xmlTools.getAttributeValueDouble(bounds, "maxlon");
-        boundingBox = new BoundingBox<>(new WGS84Coordinate(minLon, maxLat), new WGS84Coordinate(maxLon, minLat));
+        if (bounds != null) {
+            double minLat = xmlTools.getRequiredAttributeValueDouble(bounds, "minlat");
+            double minLon = xmlTools.getRequiredAttributeValueDouble(bounds, "minlon");
+            double maxLat = xmlTools.getRequiredAttributeValueDouble(bounds, "maxlat");
+            double maxLon = xmlTools.getRequiredAttributeValueDouble(bounds, "maxlon");
+            boundingBox = new BoundingBox<>(new WGS84Coordinate(minLon, maxLat), new WGS84Coordinate(maxLon, minLat));
+        } else {
+            boundingBox = null;
+        }
 
         // Create the OSM object
         OSM newOSM = new OSM(boundingBox);
@@ -78,13 +96,17 @@ public class OSM {
         // Get all nodes
         NodeList rawNodes = doc.getElementsByTagName("node");
         for (int i = 0; i < rawNodes.getLength(); ++i) {
-            newOSM.addNode(Node.fromXML(rawNodes.item(i)));
+            if (rawNodes.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                newOSM.addNode(Node.fromXML((Element) rawNodes.item(i)));
+            }
         }
 
         // Get all ways
         NodeList rawWays = doc.getElementsByTagName("way");
         for (int i = 0; i < rawWays.getLength(); ++i) {
-            newOSM.addWay(Way.fromXML(rawWays.item(i)));
+            if (rawWays.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                newOSM.addWay(Way.fromXML((Element) rawWays.item(i)));
+            }
         }
 
         return newOSM;
@@ -98,31 +120,36 @@ public class OSM {
         this.boundingBox = boundingBox;
     }
 
-    /** Returns a non-modifiable list of Nodes. */
+    /** Returns a non-modifiable list of <code>Node</code>s. */
     public List<Node> getNodes() {
         return List.copyOf(nodes.values());
     }
 
-    /** Returns a Node given an id, or null if no such Node exists. */
+    /** Returns a <code>Node</code> given an id, or <code>null</code> if no such <code>Node</code> exists. */
     public Node getNodeById(long id) {
         return nodes.get(id);
     }
 
-    /** Adds a new Node to the list of Nodes. */
+    /**
+     * Adds a new <code>Node</code> to the list of <code>Node</code>s. The <code>Node</code> cannot be
+     * <code>null</code>.
+     */
     public void addNode(Node newNode) {
         // Add the node
-        nodes.put(newNode.getId(), newNode);
+        nodes.put(newNode.getId(), Objects.requireNonNull(newNode));
 
         // Adjust bounds accordingly
         adjustBoundsIfNecessary(newNode);
     }
 
     /**
-     * Removes a Node by id, or does nothing if such a Node doesn't exist.
-     * @param id the id of the node to remove
-     * @param adjustBounds Whether to shrink the nodeBoundingBox if the removal of the node requires it. This is an O(n)
-     *                     process where n is the number of nodes, so for multiple removals in a row, it is best to set
-     *                     this to false and then call adjustNodeBounds at the end.
+     * Removes a <code>Node</code> by id, or does nothing if it doesn't exist.
+     *
+     * @param id           the id of the <code>Node</code> to remove
+     * @param adjustBounds Whether to shrink the <code>nodeBoundingBox</code> if the removal of the node requires it.
+     *                     This is an O(n) process where n is the number of nodes, so for multiple removals in a row,
+     *                     it is best to set this to <code>false</code> and then call
+     *                     <a href="#{@link}>{@link #adjustNodeBounds()}</a> at the end.
      */
     public void removeNodeById(long id, boolean adjustBounds) {
         nodes.remove(id);
@@ -133,40 +160,43 @@ public class OSM {
     }
 
     /**
-     * Removes a Node by id, or does nothing if such a Node doesn't exist. Automatically adjusts the nodeBoundingBox
-     * as necessary.
+     * Removes a <code>Node</code> by id, or does nothing if it doesn't exist. Automatically adjusts the
+     * <code>nodeBoundingBox</code> as necessary.
      */
     public void removeNodeById(long id) {
         removeNodeById(id, true);
     }
 
-    /** Clears the list of Nodes. */
+    /** Clears the list of <code>Node</code>s. */
     public void clearNodes() {
         nodes.clear();
         nodeBoundingBox = null;
     }
 
-    /** Returns a non-modifiable list of Ways. */
+    /** Returns a non-modifiable list of <code>Way</code>s. */
     public List<Way> getWays() {
         return List.copyOf(ways.values());
     }
 
-    /** Returns a Way given an id, or null if no such Way exists. */
+    /** Returns a <code>Way</code> given an id, or null if it doesn't exist. */
     public Way getWayById(long id) {
         return ways.get(id);
     }
 
-    /** Adds a new Way to the list of Ways. */
+    /**
+     * Adds a new <code>Way</code> to the list of <code>Way</code>s. The <code>Way</code> cannot be
+     * <code>null</code>.
+     */
     public void addWay(Way newWay) {
-        ways.put(newWay.getId(), newWay);
+        ways.put(newWay.getId(), Objects.requireNonNull(newWay));
     }
 
-    /** Removes a Way by id, or does nothing if such a Way doesn't exist. */
+    /** Removes a <code>Way</code> by id, or does nothing if it doesn't exist. */
     public void removeWayById(long id) {
         ways.remove(id);
     }
 
-    /** Clears the list of Ways. */
+    /** Clears the list of <code>Way</code>s. */
     public void clearWays() {
         ways.clear();
     }
@@ -175,7 +205,7 @@ public class OSM {
         return nodeBoundingBox;
     }
 
-    /** Shrinks the bounding box as necessary to fully contain all nodes exactly. */
+    /** Shrinks the <code>nodeBoundingBox</code> as necessary to fully contain all <code>Node</code>s exactly. */
     public void adjustNodeBounds() {
         nodeBoundingBox = null;
         for (Node n : nodes.values()) {
@@ -183,7 +213,11 @@ public class OSM {
         }
     }
 
-    /** Given a way id, creates a list of all Nodes in the Way. */
+    /**
+     * Given a <code>Way</code> id, creates a list of all <code>Node</code>s in the <code>Way</code>.
+     *
+     * @return the list of <code>Nodes</code> or <code>null</code> if such a <code>Way</code> doesn't exist
+     */
     public List<Node> getNodesInWay(long wayId) throws UserInputException {
         Way way = getWayById(wayId);
 
@@ -206,7 +240,10 @@ public class OSM {
         return nodes;
     }
 
-    /** If node n is outside the current nodeBoundingBox, this function expands it to contain n. */
+    /**
+     * If <code>Node</code> <code>n</code> is outside the current <code>nodeBoundingBox</code>, this function expands
+     * the bounding box to contain <code>n</code>.
+     */
     private void adjustBoundsIfNecessary(Node n) {
         boolean boundsChanged = false;
         WGS84Coordinate position = n.getPosition();
@@ -239,10 +276,8 @@ public class OSM {
         }
 
         if (boundsChanged) {
-            nodeBoundingBox = new BoundingBox<>(
-                    new WGS84Coordinate(minLon, maxLat),
-                    new WGS84Coordinate(maxLon, minLat)
-            );
+            nodeBoundingBox = new BoundingBox<>(new WGS84Coordinate(minLon, maxLat),
+                                                new WGS84Coordinate(maxLon, minLat));
         }
     }
 }

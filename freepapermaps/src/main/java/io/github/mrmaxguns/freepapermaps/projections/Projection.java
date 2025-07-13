@@ -1,6 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -14,7 +15,7 @@ public abstract class Projection {
 
     /** Constructs a Projection given a point of origin (WGS84). */
     public Projection(WGS84Coordinate origin) {
-        this.origin = origin;
+        this.origin = Objects.requireNonNull(origin);
     }
 
     /** Gets the projection's human-readable name. */

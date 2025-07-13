@@ -1,7 +1,7 @@
 package io.github.mrmaxguns.freepapermaps;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,7 +17,7 @@ public class TestingUtility {
         return builder.parse(is);
     }
 
-    public static Node loadXMLNodeFromString(String xml) throws Exception {
+    public static Element loadXMLElementFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
