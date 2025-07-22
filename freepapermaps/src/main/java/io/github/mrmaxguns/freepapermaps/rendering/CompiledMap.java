@@ -38,6 +38,7 @@ public class CompiledMap {
         // hide any nodes outside the bounds that we used purely for maintaining correct geometry.
         BoundingBox<ScaledCoordinate> finalBounds = scaler.scale(projection.project(mapData.getBoundingBox()));
         ScaledCoordinate finalOrigin = finalBounds.getTopLeftCorner();
+        // TODO: Replace instances of fillRect/Rectangle with variants that allow double values
         Rectangle clippingRect = new Rectangle(asInteger(finalOrigin.getX()), asInteger(finalOrigin.getY()),
                                                asInteger(finalBounds.getWidth()),
                                                asInteger(Math.round(finalBounds.getHeight())));

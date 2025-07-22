@@ -94,8 +94,13 @@ public class App {
             scaleOption = ScaleOption.Fixed;
         }
 
+        boolean attribution = true;
+        if (cmd.hasOption("n")) {
+            attribution = false;
+        }
+
         // Create the map!
-        createMap(inputFileName, styleFileName, outputFile, scale, scaleOption);
+        createMap(inputFileName, styleFileName, outputFile, scale, scaleOption, attribution);
     }
 
     private static Options getOptions() {
@@ -105,11 +110,13 @@ public class App {
         options.addOption("c", "scale", true, "set the map scale (1:SCALE) (cannot use with -w or -h)");
         options.addOption("w", "width", true, "set the map width with a unit (cannot use with -c or -h)");
         options.addOption("h", "height", true, "set the map height with a unit (cannot use with -c or -w)");
+        options.addOption("n", "hide-copyright-notice", false,
+                          "omit the OSM copyright notice (be sure to attribute OSM properly)");
         return options;
     }
 
-    private static void createMap(String inputFileName, String styleFileName, OutputStream outputFile,
-                                  double scale, ScaleOption scaleOption)
+    private static void createMap(String inputFileName, String styleFileName, OutputStream outputFile, double scale,
+                                  ScaleOption scaleOption, boolean attribution)
             throws ParserConfigurationException, UserInputException, SVGGraphics2DIOException  {
         // Gather necessary resources
         OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)), new XMLTools(inputFileName));
@@ -137,7 +144,7 @@ public class App {
         }
 
         // Render the map!
-        MapRenderer renderer = new MapRenderer(mapData, mapStyle, projection, scaler);
+        MapRenderer renderer = new MapRenderer(mapData, mapStyle, projection, scaler, attribution);
         renderer.renderToStream(outputFile);
     }
 

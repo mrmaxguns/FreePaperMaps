@@ -174,7 +174,6 @@ licensed under the Open Database License.**
 
 Before first "release":
 
-- OSM copyright notice
 - Simple shapes for nodes
 
 Future:
