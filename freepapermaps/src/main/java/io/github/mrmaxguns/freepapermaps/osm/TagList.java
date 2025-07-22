@@ -15,6 +15,22 @@ import java.util.Map;
  * values.
  */
 public class TagList extends HashMap<String, String> {
+    public TagList() {
+        super();
+    }
+
+    public TagList(int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    public TagList(int initialCapacity, int loadFactor) {
+        super(initialCapacity, loadFactor);
+    }
+
+    public TagList(TagList t) {
+        super(t);
+    }
+
     public void insertFromXML(NodeList tags) throws UserInputException {
         insertFromXML(tags, new XMLTools());
     }
@@ -41,6 +57,10 @@ public class TagList extends HashMap<String, String> {
      * go both ways.
      */
     public boolean isQuerySubset(TagList other) {
+        if (this == other) {
+            return true;
+        }
+
         for (Map.Entry<String, String> entry : entrySet()) {
             if (!other.containsKey(entry.getKey())) {
                 return false;
