@@ -124,5 +124,13 @@
     </plugin>
   </plugins>
 </build>
+
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/mrmaxguns/freepapermaps</url>
+    </repository>
+  </distributionManagement>
+
 </project>
 
