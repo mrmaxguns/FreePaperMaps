@@ -104,6 +104,30 @@ licensed under the Open Database License.**
 - Supports styling by querying tags
 - Support for specifying dimensions/scale
 
+## Downloading
+
+Currently, FreePaperMaps is distributed as a JAR file. Go to https://github.com/mrmaxguns/FreePaperMaps/packages/ and
+find the latest version. On the right side you will find links to download the JAR file. **Make sure you download the
+JAR file that has `with-dependencies` in the filename.**
+
+## Usage
+
+The easiest way to download OSM map data is to go to https://openstreetmap.org and use the export feature. After selecting
+the area you wish to download, you will be able to download it in OSM format.
+
+Next, create an XML style file. As this is a new project, the style format has not yet been documented, but examples
+are provided on this README.
+
+Finally, run FreePaperMaps with `java -jar FILE` (replace FILE with the actual JAR filename). You can use
+`java -jar FILE --help` to get a list of all supported options. Here is an exacmple of how I normally compile maps:
+
+```bash
+java -jar freepapermaps.jar -o map.svg -W 8in -s style.xml map.osm 
+```
+
+In the example above we created a map at `map.svg` whose width is 8 inches, using the style found in `style.xml` and
+the data in `map.osm`.
+
 ## Example style file and output
 
 ![A map with brown and pastel tones showing features such as buildings, water, roads, and paths.](style.png)
@@ -164,6 +188,42 @@ licensed under the Open Database License.**
         <polyline ref="footway" stroke="#324f21"/>
         <polyline ref="path" stroke="#324f21"/>
         <polyline ref="cycleway" stroke="#324f21"/>
+    </layers>
+</style>
+```
+
+</details>
+
+![A map in dark mode featuring a park where trees are marked with circles and artworks with squares.](example2.png)
+
+<details>
+<summary>View the style file that produced the map</summary>
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<style>
+    <setting k="background-color" v="#070a23"/>
+
+    <selectors>
+      <way id="park"><tag k="leisure" v="park"/></way>
+      <way id="water"><tag k="natural" v="water"/></way>
+      <way id="secondary"><tag k="highway" v="secondary"/></way>
+      <way id="highway"><tag k="highway" v="trunk"/></way>
+      <way id="footway"><tag k="highway" v="footway"/></way>
+      <node id="tree"><tag k="natural" v="tree"/></node>
+      <node id="artwork"><tag k="tourism" v="artwork"/></node>
+      <node id="memorial"><tag k="historic" v="memorial"/></node>
+    </selectors>
+      
+    <layers>
+      <polyline ref="park" fill="#082d17"/>
+      <polyline ref="water" fill="#0d2d6d"/>
+      <polyline ref="secondary" stroke="#2518ba" thickness="3"/>
+      <polyline ref="highway" stroke="#2518ba" thickness="5"/>
+      <polyline ref="footway" stroke="#18ba18" thickness="1"/>
+      <nodeshape ref="tree" fill="#4bea4b" angle="0" radius="1" vertices="10"/>
+      <nodeshape ref="artwork" fill="#828c38" angle="0" radius="1" vertices="4"/>
+      <nodeshape ref="memorial" fill="#828c38" angle="0" radius="1" vertices="4"/>
     </layers>
 </style>
 ```
