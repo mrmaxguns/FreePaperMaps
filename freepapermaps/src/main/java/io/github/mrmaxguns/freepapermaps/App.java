@@ -20,6 +20,8 @@ import static io.github.mrmaxguns.freepapermaps.UnitManager.parseNumberWithUnit;
 
 
 public class App {
+    private final static String PROGRAM_VERSION = "0.1";
+
     enum ScaleOption {
         Fixed,
         Width,
@@ -28,7 +30,7 @@ public class App {
 
     public static void main(String[] args) throws ParserConfigurationException, SVGGraphics2DIOException {
         try {
-            runProgram(args);
+            System.exit(runProgram(args));
         } catch (UserInputException e) {
             // Handle gracefully any errors that should be messaged to the user
             System.err.println(e.getMessage());
@@ -36,7 +38,7 @@ public class App {
         }
     }
 
-    public static void runProgram(String[] args) throws ParserConfigurationException, SVGGraphics2DIOException,
+    public static int runProgram(String[] args) throws ParserConfigurationException, SVGGraphics2DIOException,
             UserInputException {
         // Define command-line flags
         Options options = getOptions();
@@ -47,7 +49,22 @@ public class App {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            throw new UserInputException("Could not parse command-line arguments.");
+            throw new UserInputException("Could not parse command-line arguments. " + e.getMessage() + ".");
+        }
+
+        // Print help or version
+        if (cmd.hasOption("h")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("freepapermaps [OPTIONS] [OSM FILE]", options);
+            return 0;
+        }
+
+        if (cmd.hasOption("v")) {
+            System.out.println("FreePaperMaps " + PROGRAM_VERSION);
+            System.out.println("Copyright (C) 2025 Maxim Rebguns");
+            System.out.println("This is free software; see the source for copying conditions.  There is NO");
+            System.out.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
+            return 0;
         }
 
         // Handle the input file argument
@@ -57,7 +74,6 @@ public class App {
         }
         String inputFileName = leftOverArgs[0];
 
-        // Handle flags
         OutputStream outputFile;
         if (cmd.hasOption("o")) {
             try {
@@ -83,33 +99,33 @@ public class App {
                 throw new UserInputException("Map scale must be a number.");
             }
             scaleOption = ScaleOption.Fixed;
-        } else if (cmd.hasOption("w")) {
-            scale = parseNumberWithUnit(cmd.getOptionValue("w"));
+        } else if (cmd.hasOption("W")) {
+            scale = parseNumberWithUnit(cmd.getOptionValue("W"));
             scaleOption = ScaleOption.Width;
-        } else if (cmd.hasOption("h")) {
-            scale = parseNumberWithUnit(cmd.getOptionValue("h"));
+        } else if (cmd.hasOption("H")) {
+            scale = parseNumberWithUnit(cmd.getOptionValue("H"));
             scaleOption = ScaleOption.Height;
         } else {
             scale = 1;
             scaleOption = ScaleOption.Fixed;
         }
 
-        boolean attribution = true;
-        if (cmd.hasOption("n")) {
-            attribution = false;
-        }
+        boolean attribution = !cmd.hasOption("n");
 
         // Create the map!
         createMap(inputFileName, styleFileName, outputFile, scale, scaleOption, attribution);
+        return 0;
     }
 
     private static Options getOptions() {
         Options options = new Options();
+        options.addOption("h", "help", false, "get information about program options");
+        options.addOption("v", "version", false, "print the current version");
         options.addOption("o", "output", true, "write the SVG to a specified output file instead of stdout");
         options.addOption("s", "style", true, "specify an XML style file");
-        options.addOption("c", "scale", true, "set the map scale (1:SCALE) (cannot use with -w or -h)");
-        options.addOption("w", "width", true, "set the map width with a unit (cannot use with -c or -h)");
-        options.addOption("h", "height", true, "set the map height with a unit (cannot use with -c or -w)");
+        options.addOption("c", "scale", true, "set the map scale (1:SCALE) (cannot use with -W or -H)");
+        options.addOption("W", "width", true, "set the map width with a unit (cannot use with -c or -H)");
+        options.addOption("H", "height", true, "set the map height with a unit (cannot use with -c or -W)");
         options.addOption("n", "hide-copyright-notice", false,
                           "omit the OSM copyright notice (be sure to attribute OSM properly)");
         return options;
