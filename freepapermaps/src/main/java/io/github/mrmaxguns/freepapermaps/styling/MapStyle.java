@@ -207,7 +207,7 @@ public class MapStyle {
                 }
 
                 for (Node node : mapData.getNodes()) {
-                    if (selector.matches(node)) {
+                    if (node.isVisible() && selector.matches(node)) {
                         map.add(layer.compile(node, mapData, projection));
                     }
                 }
@@ -223,7 +223,7 @@ public class MapStyle {
                 }
 
                 for (Way way : mapData.getWays()) {
-                    if (selector.matches(way)) {
+                    if (way.isVisible() && selector.matches(way)) {
                         map.add(layer.compile(way, mapData, projection));
                     }
                 }

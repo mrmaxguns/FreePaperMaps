@@ -175,12 +175,11 @@ licensed under the Open Database License.**
 Before first "release":
 
 - OSM copyright notice
-- Don't render invisible attributes
-- Tests
 - Simple shapes for nodes
 
 Future:
 
+- More comprehensive tests
 - Allow processing OSM data from Overpass queries
 - Arbitrary projections with `proj`
 - SVG icons for nodes/ways
