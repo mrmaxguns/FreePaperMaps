@@ -83,6 +83,20 @@ public class XMLTools {
         return value;
     }
 
+    public int getRequiredAttributeValueInt(Element el, String attributeName) throws UserInputException {
+        String rawValue = getAttributeValue(el, attributeName);
+
+        int value;
+        try {
+            value = Integer.parseInt(rawValue);
+        } catch (NumberFormatException e) {
+            throw error("Found attribute '" + attributeName + "' of tag '" + el.getTagName() + "' that has value '" +
+                        rawValue + "', that could not be parsed as an integer.");
+        }
+
+        return value;
+    }
+
     public long getRequiredAttributeValueLong(Element el, String attributeName) throws UserInputException {
         String rawValue = getAttributeValue(el, attributeName);
 

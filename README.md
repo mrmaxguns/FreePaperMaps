@@ -172,12 +172,6 @@ licensed under the Open Database License.**
 
 ## Roadmap
 
-Before first "release":
-
-- Simple shapes for nodes
-
-Future:
-
 - More comprehensive tests
 - Allow processing OSM data from Overpass queries
 - Arbitrary projections with `proj`
@@ -189,3 +183,4 @@ Future:
 - Different styling by zoom level
 - Geometry simplification
 - Data download informed by the style sheet
+- Layering support with `layer` tag

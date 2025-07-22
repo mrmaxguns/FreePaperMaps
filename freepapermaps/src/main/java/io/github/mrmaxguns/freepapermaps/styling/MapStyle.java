@@ -99,6 +99,7 @@ public class MapStyle {
             Element layer = (Element) layers.item(i);
             switch (layer.getTagName()) {
                 case "polyline" -> style.addWayLayer(PolylineLayer.fromXML(layer, xmlTools));
+                case "nodeshape" -> style.addNodeLayer(NodeShapeLayer.fromXML(layer, xmlTools));
                 default -> throw new UserInputException("Undefined layer type '" + layer.getTagName() + "'.");
             }
         }
