@@ -112,6 +112,8 @@ JAR file that has `with-dependencies` in the filename.**
 
 ## Usage
 
+Full documentation is at the [Wiki](https://github.com/mrmaxguns/FreePaperMaps/wiki/).
+
 The easiest way to download OSM map data is to go to https://openstreetmap.org and use the export feature. After selecting
 the area you wish to download, you will be able to download it in OSM format.
 
