@@ -35,7 +35,7 @@ public class CompiledNodeShape extends CompiledGeometry {
 
         double rotationAngle = Math.toRadians(360.0 / style.getVertices());
 
-        for (int i = 0; i < style.getVertices() - 1; ++i) {
+        for (int i = 0; i < style.getVertices(); ++i) {
             double oldX = currentX; // Save the value of x since we want the value before reassignment to calculate y
             currentX = (currentX * Math.cos(rotationAngle)) - (currentY * Math.sin(rotationAngle));
             currentY = (oldX * Math.sin(rotationAngle)) + (currentY * Math.cos(rotationAngle));
