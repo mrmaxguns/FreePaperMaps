@@ -8,7 +8,8 @@ import java.awt.geom.GeneralPath;
 
 
 public class CompiledNodeShape extends CompiledGeometry {
-    public static final float DEFAULT_STROKE_WIDTH = 2;
+    public static final Stroke DEFAULT_STROKE_PROPERTIES = new BasicStroke(2, BasicStroke.CAP_SQUARE,
+                                                                           BasicStroke.JOIN_MITER);
     public static final Color DEFAULT_FILL = Color.GREEN;
     private final ProjectedCoordinate position;
     private final NodeShapeLayer style;
@@ -47,7 +48,7 @@ public class CompiledNodeShape extends CompiledGeometry {
         if (style.getStrokeProperties() != null) {
             g2d.setStroke(style.getStrokeProperties());
         } else {
-            g2d.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+            g2d.setStroke(DEFAULT_STROKE_PROPERTIES);
         }
 
         // If there is a fill, do that first

@@ -244,3 +244,4 @@ the data in `map.osm`.
 - Geometry simplification
 - Data download informed by the style sheet
 - Layering support with `layer` tag
+- Allow exporting OSM, MapStyle, and CompiledMap objects to XML
