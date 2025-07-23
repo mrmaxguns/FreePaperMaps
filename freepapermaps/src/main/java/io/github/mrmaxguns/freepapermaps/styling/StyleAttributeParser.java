@@ -83,14 +83,14 @@ public class StyleAttributeParser {
             String thickness = xmlTools.getAttributeValue(el, prop[0]);
             String cap = xmlTools.getAttributeValue(el, prop[1]);
             String join = xmlTools.getAttributeValue(el, prop[2]);
-            result.strokeProperties.put(thickness, parseStroke(thickness, cap, join));
+            result.strokeProperties.put(prop[0], parseStroke(thickness, cap, join));
         }
 
         for (String[] prop : optionalStrokeProperties) {
             String thickness = xmlTools.getAttributeValue(el, prop[0], false);
             String cap = xmlTools.getAttributeValue(el, prop[1], false);
             String join = xmlTools.getAttributeValue(el, prop[2], false);
-            result.strokeProperties.put(thickness, parseStroke(thickness, cap, join));
+            result.strokeProperties.put(prop[0], parseStroke(thickness, cap, join));
         }
 
         for (String prop : requiredLengthProperties) {

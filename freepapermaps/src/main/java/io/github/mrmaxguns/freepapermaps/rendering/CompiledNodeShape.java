@@ -47,8 +47,6 @@ public class CompiledNodeShape extends CompiledGeometry {
         if (style.getStrokeProperties() != null) {
             g2d.setStroke(style.getStrokeProperties());
         } else {
-            // TODO: Refactor the stroking system so that cap and join have defaults that show up only in the
-            //  rendering phase
             g2d.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
         }
 
