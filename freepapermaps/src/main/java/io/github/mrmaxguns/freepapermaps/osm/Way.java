@@ -40,7 +40,7 @@ public class Way {
      * object.
      */
     public static Way fromXML(Element rawWay, XMLTools xmlTools) throws UserInputException {
-        long id = xmlTools.getRequiredAttributeValueLong(rawWay, "id");
+        long id = xmlTools.getAttributeValueLong(rawWay, "id");
 
         // Get optional visibility attribute
         boolean visible = true;
@@ -62,7 +62,7 @@ public class Way {
             Element child = (Element) children.item(i);
             if (child.getTagName().equals("nd")) {
                 // Parse node references
-                newWay.addNodeId(xmlTools.getRequiredAttributeValueLong(child, "ref"));
+                newWay.addNodeId(xmlTools.getAttributeValueLong(child, "ref"));
             } else if (child.getTagName().equals("tag")) {
                 // Parse tags
                 newWay.getTags().put(

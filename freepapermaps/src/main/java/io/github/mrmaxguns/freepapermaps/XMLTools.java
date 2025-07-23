@@ -4,9 +4,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class XMLTools {
@@ -69,8 +67,17 @@ public class XMLTools {
         return attribute.getNodeValue();
     }
 
-    public double getRequiredAttributeValueDouble(Element el, String attributeName) throws UserInputException {
-        String rawValue = getAttributeValue(el, attributeName);
+    public double getAttributeValueDouble(Element el, String attributeName) throws UserInputException {
+        return getAttributeValueDouble(el, attributeName, true).orElseThrow();
+    }
+
+    public OptionalDouble getAttributeValueDouble(Element el, String attributeName, boolean required) throws
+            UserInputException {
+        String rawValue = getAttributeValue(el, attributeName, required);
+
+        if (rawValue == null) {
+            return OptionalDouble.empty();
+        }
 
         double value;
         try {
@@ -80,11 +87,20 @@ public class XMLTools {
                     + rawValue + "', that could not be parsed as a decimal number.");
         }
 
-        return value;
+        return OptionalDouble.of(value);
     }
 
-    public int getRequiredAttributeValueInt(Element el, String attributeName) throws UserInputException {
-        String rawValue = getAttributeValue(el, attributeName);
+    public int getAttributeValueInt(Element el, String attributeName) throws UserInputException {
+        return getAttributeValueInt(el, attributeName, true).orElseThrow();
+    }
+
+    public OptionalInt getAttributeValueInt(Element el, String attributeName, boolean required) throws
+            UserInputException {
+        String rawValue = getAttributeValue(el, attributeName, required);
+
+        if (rawValue == null) {
+            return OptionalInt.empty();
+        }
 
         int value;
         try {
@@ -94,11 +110,20 @@ public class XMLTools {
                         rawValue + "', that could not be parsed as an integer.");
         }
 
-        return value;
+        return OptionalInt.of(value);
     }
 
-    public long getRequiredAttributeValueLong(Element el, String attributeName) throws UserInputException {
-        String rawValue = getAttributeValue(el, attributeName);
+    public long getAttributeValueLong(Element el, String attributeName) throws UserInputException {
+        return getAttributeValueLong(el, attributeName, true).orElseThrow();
+    }
+
+    public OptionalLong getAttributeValueLong(Element el, String attributeName, boolean required) throws
+            UserInputException {
+        String rawValue = getAttributeValue(el, attributeName, required);
+
+        if (rawValue == null) {
+            return OptionalLong.empty();
+        }
 
         long value;
         try {
@@ -108,29 +133,10 @@ public class XMLTools {
                     + rawValue + "', that could not be parsed as an integer.");
         }
 
-        return value;
+        return OptionalLong.of(value);
     }
 
-    /** Returns a Color parsed from colorName, which should be a 24-bit integer representation. */
-    public Color parseColor(String colorName) throws UserInputException {
-        try {
-            return Color.decode(colorName);
-        } catch (NumberFormatException e) {
-            throw error("Invalid color '" + colorName + "'.");
-        }
-    }
-
-    public Stroke parseStroke(String rawThickness) throws UserInputException {
-        float thickness;
-        try {
-            thickness = Float.parseFloat(rawThickness);
-        } catch (NumberFormatException e) {
-            throw error("Invalid thickness value '" + rawThickness + "'.");
-        }
-        return new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    }
-
-    private UserInputException error(String message) {
+    public UserInputException error(String message) {
         if (fileIdentifier != null) {
             return new UserInputException("XML Error: " + fileIdentifier + ": " + message);
         }

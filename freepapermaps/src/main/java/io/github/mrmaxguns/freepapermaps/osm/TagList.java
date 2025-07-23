@@ -19,22 +19,30 @@ public class TagList extends HashMap<String, String> {
         super();
     }
 
+    /** Constructs a <code>TagList</code> with an initial capacity. */
     public TagList(int initialCapacity) {
         super(initialCapacity);
     }
 
+    /** Constructs a <code>TagList</code> with an initial capacity and load factor. */
     public TagList(int initialCapacity, int loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
+    /** Constructs a <code>TagList</code> from a shallow copy of another. */
     public TagList(TagList t) {
         super(t);
     }
 
+    /** Constructs a <code>TagList</code> from an XML NodeList of tags. Non-tag elements are ignored. */
     public void insertFromXML(NodeList tags) throws UserInputException {
         insertFromXML(tags, new XMLTools());
     }
 
+    /**
+     * Constructs a <code>TagList</code> from an XML <code>NodeList</code> of tags and with a context from an
+     * <code>XMLTools</code> object. Non-tag elements are ignored.
+     */
     public void insertFromXML(NodeList tags, XMLTools xmlTools) throws UserInputException {
         for (int i = 0; i < tags.getLength(); ++i) {
             if (tags.item(i).getNodeType() != Node.ELEMENT_NODE) {
@@ -53,8 +61,8 @@ public class TagList extends HashMap<String, String> {
      * <p>
      * This is a special type of subset that is useful for queries. There is a very particular treatment of ""/null values
      * that allows ""/null to be used as a "wildcard". In other words, if this TagList contains a key with a ""/null value,
-     * it will count as a match even if the other TagList we're checking has a non-null value, but this property doesn't
-     * go both ways.
+     * it will count as a match even if the other TagList we're checking has a non-null value. The wildcard property
+     * does not work the other way around.
      */
     public boolean isQuerySubset(TagList other) {
         if (this == other) {

@@ -38,11 +38,11 @@ public class Node {
      * object.
      */
     public static Node fromXML(Element rawNode, XMLTools xmlTools) throws UserInputException {
-        long id = xmlTools.getRequiredAttributeValueLong(rawNode, "id");
+        long id = xmlTools.getAttributeValueLong(rawNode, "id");
 
         // Get position
-        double lon = xmlTools.getRequiredAttributeValueDouble(rawNode, "lon");
-        double lat = xmlTools.getRequiredAttributeValueDouble(rawNode, "lat");
+        double lon = xmlTools.getAttributeValueDouble(rawNode, "lon");
+        double lat = xmlTools.getAttributeValueDouble(rawNode, "lat");
         WGS84Coordinate position = new WGS84Coordinate(lon, lat);
 
         // Get optional attribute visible

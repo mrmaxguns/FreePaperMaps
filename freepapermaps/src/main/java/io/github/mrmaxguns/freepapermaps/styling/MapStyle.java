@@ -61,6 +61,7 @@ public class MapStyle {
     /** Constructs a new MapStyle from an XML "styling" document specific to FreePaperMaps. */
     public static MapStyle fromXML(Document doc, XMLTools xmlTools) throws UserInputException {
         // Parse global settings
+        StyleAttributeParser parser = new StyleAttributeParser(xmlTools);
         java.util.List<Element> settings = xmlTools.getDirectChildElementsByTagName(doc, "setting");
         Color backgroundColor = null;
         for (Element setting : settings) {
@@ -68,7 +69,7 @@ public class MapStyle {
             String val = xmlTools.getAttributeValue(setting, "v");
 
             switch (key) {
-                case "background-color" -> backgroundColor = xmlTools.parseColor(val);
+                case "background-color" -> backgroundColor = parser.parseColor(val);
             default -> throw new UserInputException("Unknown setting '" + key + "'.");
             }
         }

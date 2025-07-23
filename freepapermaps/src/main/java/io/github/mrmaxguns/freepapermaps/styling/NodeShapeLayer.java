@@ -10,6 +10,7 @@ import io.github.mrmaxguns.freepapermaps.rendering.CompiledNodeShape;
 import org.w3c.dom.Element;
 
 import java.awt.*;
+import java.util.OptionalDouble;
 
 
 public class NodeShapeLayer extends Layer<Node> {
@@ -36,27 +37,28 @@ public class NodeShapeLayer extends Layer<Node> {
     }
 
     public static NodeShapeLayer fromXML(Element rawLayer, XMLTools xmlTools) throws UserInputException {
-        String ref = xmlTools.getAttributeValue(rawLayer, "ref");
+        StyleAttributeParser parser = new StyleAttributeParser(xmlTools);
+        parser.addStringProperty("ref", true);
+        parser.addColorProperty("stroke", false);
+        parser.addColorProperty("fill", false);
+        parser.addStrokeProperty("thickness", "cap", "join", false);
+        parser.addCountProperty("vertices", true);
+        parser.addLengthProperty("radius", true);
+        parser.addAngleProperty("angle", false);
+        StyleAttributeParser.ParsedAttributes attributes = parser.parse(rawLayer);
 
-        String rawStroke = xmlTools.getAttributeValue(rawLayer, "stroke", false);
-        Color stroke = rawStroke != null ? xmlTools.parseColor(rawStroke) : null;
-
-        String rawFill = xmlTools.getAttributeValue(rawLayer, "fill", false);
-        Color fill = rawFill != null ? xmlTools.parseColor(rawFill) : null;
-
-        String thickness = xmlTools.getAttributeValue(rawLayer, "thickness", false);
-        Stroke strokeProperties = thickness != null ? xmlTools.parseStroke(thickness) : null;
-
-        int vertices = xmlTools.getRequiredAttributeValueInt(rawLayer, "vertices");
+        int vertices = attributes.countProperties.get("vertices").orElseThrow();
         if (vertices < 3) {
             throw new UserInputException("Found node shape layer with less than 3 vertices.");
         }
 
-        double radius = xmlTools.getRequiredAttributeValueDouble(rawLayer, "radius");
+        OptionalDouble radius = attributes.lengthProperties.get("radius");
+        OptionalDouble angle = attributes.angleProperties.get("angle");
 
-        double angle = xmlTools.getRequiredAttributeValueDouble(rawLayer, "angle");
-
-        return new NodeShapeLayer(ref, stroke, fill, strokeProperties, vertices, radius, angle);
+        return new NodeShapeLayer(attributes.stringProperties.get("ref"), attributes.colorProperties.get("stroke"),
+                                  attributes.colorProperties.get("fill"), attributes.strokeProperties.get("thickness"),
+                                  vertices, radius.isEmpty() ? 2.0 : radius.getAsDouble(),
+                                  angle.isEmpty() ? 0.0 : angle.getAsDouble());
     }
 
     public CompiledGeometry compile(Node node, OSM mapData, Projection projection) {

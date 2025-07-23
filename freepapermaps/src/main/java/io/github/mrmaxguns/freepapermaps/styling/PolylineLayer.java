@@ -39,18 +39,15 @@ public class PolylineLayer extends Layer<Way> {
 
     /** Constructs a new PolylineLayer from a node found in an XML style file. */
     public static PolylineLayer fromXML(Element rawLayer, XMLTools xmlTools) throws UserInputException {
-        String ref = xmlTools.getAttributeValue(rawLayer, "ref");
+        StyleAttributeParser parser = new StyleAttributeParser(xmlTools);
+        parser.addStringProperty("ref", true);
+        parser.addColorProperty("stroke", false);
+        parser.addColorProperty("fill", false);
+        parser.addStrokeProperty("thickness", "cap", "join", false);
+        StyleAttributeParser.ParsedAttributes attributes = parser.parse(rawLayer);
 
-        String rawStroke = xmlTools.getAttributeValue(rawLayer, "stroke", false);
-        Color stroke = rawStroke != null ? xmlTools.parseColor(rawStroke) : null;
-
-        String rawFill = xmlTools.getAttributeValue(rawLayer, "fill", false);
-        Color fill = rawFill != null ? xmlTools.parseColor(rawFill) : null;
-
-        String thickness = xmlTools.getAttributeValue(rawLayer, "thickness", false);
-        Stroke strokeProperties = thickness != null ? xmlTools.parseStroke(thickness) : null;
-
-        return new PolylineLayer(ref, stroke, fill, strokeProperties);
+        return new PolylineLayer(attributes.stringProperties.get("ref"), attributes.colorProperties.get("stroke"),
+                                 attributes.colorProperties.get("fill"), attributes.strokeProperties.get("thickness"));
     }
 
     public CompiledGeometry compile(Way way, OSM mapData, Projection projection) throws UserInputException {

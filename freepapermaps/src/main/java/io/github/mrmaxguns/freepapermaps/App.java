@@ -2,6 +2,7 @@ package io.github.mrmaxguns.freepapermaps;
 
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
 import io.github.mrmaxguns.freepapermaps.projections.*;
+import io.github.mrmaxguns.freepapermaps.rendering.DistanceUnitManager;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
@@ -15,8 +16,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.Objects;
-
-import static io.github.mrmaxguns.freepapermaps.UnitManager.parseNumberWithUnit;
 
 
 public class App {
@@ -92,6 +91,7 @@ public class App {
 
         double scale;
         ScaleOption scaleOption;
+        DistanceUnitManager distanceUnitManager = new DistanceUnitManager();
         if (cmd.hasOption("c")) {
             try {
                 scale = Double.parseDouble(cmd.getOptionValue("c"));
@@ -100,10 +100,10 @@ public class App {
             }
             scaleOption = ScaleOption.Fixed;
         } else if (cmd.hasOption("W")) {
-            scale = parseNumberWithUnit(cmd.getOptionValue("W"));
+            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("W"));
             scaleOption = ScaleOption.Width;
         } else if (cmd.hasOption("H")) {
-            scale = parseNumberWithUnit(cmd.getOptionValue("H"));
+            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("H"));
             scaleOption = ScaleOption.Height;
         } else {
             scale = 1;

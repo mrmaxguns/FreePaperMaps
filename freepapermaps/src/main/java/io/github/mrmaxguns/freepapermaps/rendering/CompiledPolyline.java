@@ -10,7 +10,8 @@ import java.util.ArrayList;
 
 /** A CompiledPolyline is a line formed by going from one point to the next in a straight line. */
 public class CompiledPolyline extends CompiledGeometry {
-    public static final float DEFAULT_STROKE_WIDTH = 1;
+    public static final Stroke DEFAULT_STROKE_PROPERTIES = new BasicStroke(1, BasicStroke.CAP_ROUND,
+                                                                           BasicStroke.JOIN_ROUND);
     public static final Color DEFAULT_STROKE = Color.BLACK;
 
     private final ArrayList<ProjectedCoordinate> points;
@@ -45,7 +46,7 @@ public class CompiledPolyline extends CompiledGeometry {
         if (style.getStrokeProperties() != null) {
             g2d.setStroke(style.getStrokeProperties());
         } else {
-            g2d.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setStroke(DEFAULT_STROKE_PROPERTIES);
         }
 
         // If there is a fill, do that first

@@ -81,10 +81,10 @@ public class OSM {
         BoundingBox<WGS84Coordinate> boundingBox;
 
         if (bounds != null) {
-            double minLat = xmlTools.getRequiredAttributeValueDouble(bounds, "minlat");
-            double minLon = xmlTools.getRequiredAttributeValueDouble(bounds, "minlon");
-            double maxLat = xmlTools.getRequiredAttributeValueDouble(bounds, "maxlat");
-            double maxLon = xmlTools.getRequiredAttributeValueDouble(bounds, "maxlon");
+            double minLat = xmlTools.getAttributeValueDouble(bounds, "minlat");
+            double minLon = xmlTools.getAttributeValueDouble(bounds, "minlon");
+            double maxLat = xmlTools.getAttributeValueDouble(bounds, "maxlat");
+            double maxLon = xmlTools.getAttributeValueDouble(bounds, "maxlon");
             boundingBox = new BoundingBox<>(new WGS84Coordinate(minLon, maxLat), new WGS84Coordinate(maxLon, minLat));
         } else {
             boundingBox = null;
