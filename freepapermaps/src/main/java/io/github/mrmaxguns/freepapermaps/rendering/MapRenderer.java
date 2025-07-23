@@ -58,13 +58,11 @@ public class MapRenderer {
         SVGGraphics2D svgGenerator = new SVGGraphics2D(ctx, false);
 
         // Draw the map
-        renderToGraphics2D(svgGenerator);
+        Rectangle2D screen = renderToGraphics2D(svgGenerator);
 
-        // The clipping boundaries are guaranteed to give us the map's actual dimensions in mm
-        int originX = svgGenerator.getClipBounds().x;
-        int originY = svgGenerator.getClipBounds().y;
-        int width = svgGenerator.getClipBounds().width;
-        int height = svgGenerator.getClipBounds().height;
+        // Get the map's actual dimensions in mm
+        double width = screen.getWidth();
+        double height = screen.getHeight();
 
         // Attribution
         if (attribution) {
@@ -76,15 +74,14 @@ public class MapRenderer {
             LineMetrics attributionMetrics = attributionFont.getLineMetrics(attributionString, frc);
 
             svgGenerator.setColor(Color.WHITE);
-            svgGenerator.fillRect(originX, originY, asInteger(boundsAttribution.getWidth()),
+            svgGenerator.fillRect(0, 0, asInteger(boundsAttribution.getWidth()),
                                   asInteger(boundsAttribution.getHeight() + attributionMetrics.getDescent()));
             svgGenerator.setColor(Color.BLACK);
-            svgGenerator.drawString(attributionString, originX, originY + asInteger(boundsAttribution.getHeight()));
+            svgGenerator.drawString(attributionString, 0, asInteger(boundsAttribution.getHeight()));
         }
 
         // Adjust SVG properties so that units are scaled properly
         Element svgRoot = svgGenerator.getRoot(documentFactory.getDocumentElement());
-        svgRoot.appendChild(svgGenerator.getRoot());
 
         // Setting the root width and height with mm sets the units, and setting the viewBox with the same dimensions
         // ensures a 1:1 scale
@@ -99,9 +96,8 @@ public class MapRenderer {
         svgGenerator.stream(svgRoot, out, useCSS, escaped);
     }
 
-    /** Renders a map to the g2d object. */
-    public void renderToGraphics2D(Graphics2D g2d) throws UserInputException {
-        style.compile(mapData, projection, scaler).render(g2d);
-        g2d.dispose();
+    /** Renders a map to the g2d object, returning the dimensions of the map as a <code>Rectangle2D</code>. */
+    public Rectangle2D renderToGraphics2D(Graphics2D g2d) throws UserInputException {
+        return style.compile(mapData, projection, scaler).render(g2d);
     }
 }
