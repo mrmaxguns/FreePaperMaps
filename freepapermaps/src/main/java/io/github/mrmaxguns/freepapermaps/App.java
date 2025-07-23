@@ -20,7 +20,7 @@ import static io.github.mrmaxguns.freepapermaps.UnitManager.parseNumberWithUnit;
 
 
 public class App {
-    private final static String PROGRAM_VERSION = "0.1";
+    private final static String PROGRAM_VERSION = "0.2-SNAPSHOT";
 
     enum ScaleOption {
         Fixed,

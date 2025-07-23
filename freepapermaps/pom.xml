@@ -5,7 +5,7 @@
 
 <groupId>io.github.mrmaxguns.freepapermaps</groupId>
 <artifactId>freepapermaps</artifactId>
-<version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
 
 <name>freepapermaps</name>
 <!-- FIXME change it to the project's website -->
