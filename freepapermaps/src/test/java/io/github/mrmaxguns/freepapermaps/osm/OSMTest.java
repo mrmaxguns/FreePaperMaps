@@ -326,4 +326,34 @@ public class OSMTest {
         osm.clearWays();
         assertTrue(osm.getWays().isEmpty(), "clearWays should clear the way list");
     }
+
+    @Test
+    public void testGetNodesInWay() throws UserInputException {
+        List<Node> nodes = validOSM.getNodesInWay(289801717);
+        assertAll(() -> assertEquals(8, nodes.size(),
+                                     "the list returned by getNodesInWay should be equal in length to the num of " +
+                                     "nodes"),
+                  () -> assertEquals(2933410036L, nodes.get(0).getId(),
+                                     "getNodesInWay should return a list in the same order as nodes appear in the way"),
+                  () -> assertEquals(2933410028L, nodes.get(3).getId(),
+                                     "getNodesInWay should return a list in the same order as nodes appear in the way"),
+                  () -> assertEquals(2933410035L, nodes.get(7).getId(),
+                                     "getNodesInWay should return a list in the same order as nodes appear in the " +
+                                     "way"));
+    }
+
+    @Test
+    public void testGetNodesInWayFakeWay() throws UserInputException {
+        assertNull(validOSM.getNodesInWay(8938393));
+    }
+
+    @Test
+    public void testGetNodesInWayInvalidReference() throws Exception {
+        OSM osm = OSM.fromXML(loadXMLDocumentFromString(VALID_XML));
+        long wayId = 1259737750;
+        long nodeId = 11711578120L;
+        osm.removeNodeById(nodeId);
+        assertThrows(UserInputException.class, () -> osm.getNodesInWay(wayId),
+                     "Attempting to get nodes in a way referencing a nonexistent node should throw an error");
+    }
 }
