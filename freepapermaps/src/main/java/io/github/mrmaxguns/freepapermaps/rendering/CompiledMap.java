@@ -86,6 +86,11 @@ public class CompiledMap {
         double width = boundsAttribution.getWidth();
         double height = boundsAttribution.getHeight();
 
+        // TODO: Implement proper logging
+        if (width > screen.getWidth() || height > screen.getHeight()) {
+            System.err.println("Warning: attribution text exceeds map dimensions.");
+        }
+
         double boxX, boxY;
         double textX, textY;
         switch (globalSettings.attributionPosition) {
