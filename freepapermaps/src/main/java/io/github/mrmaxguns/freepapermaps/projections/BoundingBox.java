@@ -55,9 +55,26 @@ public class BoundingBox<C extends Coordinate<C>> {
 
     public double getMaxLat() { return getMaxY(); }
 
-    /** Returns true if the corners of both bounding boxes are equal, as defined by the Coordinate equals method. */
+    /** Returns true if the top left and bottom right coordinates of both bounding boxes are exactly equal. */
     public boolean equals(BoundingBox<C> other) {
-        return topLeftCorner.equals(other.getTopLeftCorner()) && bottomRightCorner.equals(other.getBottomRightCorner());
+        return equals(other, 0.0);
+    }
+
+    /**
+     * Returns true if the top left and bottom right coordinates of both bounding boxes are within (inclusive) of some
+     * <code>epsilon</code>.
+     */
+    public boolean equals(BoundingBox<C> other, double epsilon) {
+        return equals(other, epsilon, epsilon);
+    }
+
+    /**
+     * Returns true if the top left and bottom right coordinates of both bounding boxes are within (inclusive) of some
+     * x and y epsilon.
+     */
+    public boolean equals(BoundingBox<C> other, double epsilonX, double epsilonY) {
+        return topLeftCorner.equals(other.getTopLeftCorner(), epsilonX, epsilonY) &&
+               bottomRightCorner.equals(other.getBottomRightCorner(), epsilonX, epsilonY);
     }
 
     public String toString() {

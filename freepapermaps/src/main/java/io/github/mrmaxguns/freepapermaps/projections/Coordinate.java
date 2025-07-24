@@ -49,9 +49,22 @@ public abstract class Coordinate<T extends Coordinate<T>> {
         return createInstance(x * scaleFactor, y * scaleFactor);
     }
 
-    // TODO: Make this more reasonable than == with doubles
+    /** Returns true if both coordinates are exactly equal. */
     public boolean equals(T other) {
-        return x == other.getX() && y == other.getY();
+        return equals(other, 0.0);
+    }
+
+    /** Returns true if both coordinate x and y values are within (inclusive) of some <code>epsilon</code>. */
+    public boolean equals(T other, double epsilon) {
+        return equals(other, epsilon, epsilon);
+    }
+
+    /** Returns true if both coordinate x and y values are within (inclusive) of some x and y epsilon, respectively. */
+    public boolean equals(T other, double epsilonX, double epsilonY) {
+        if (this == other) {
+            return true;
+        }
+        return (Math.abs(this.x - other.x) <= epsilonX) && (Math.abs(this.y - other.y) <= epsilonY);
     }
 
     /** Returns a short, human-readable identifier of the Coordinate's type (e.g. WGS84). */
