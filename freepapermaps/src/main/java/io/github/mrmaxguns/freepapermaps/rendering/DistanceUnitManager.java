@@ -7,6 +7,7 @@ public class DistanceUnitManager extends UnitManager {
     public static final double CM_TO_MM = 10;
     public static final double M_TO_MM = 1000;
     public static final double PX_TO_MM = IN_TO_MM / 96;
+    public static final double PT_TO_MM = 0.3527777778;
 
     public DistanceUnitManager() {
         super();
@@ -17,5 +18,6 @@ public class DistanceUnitManager extends UnitManager {
         addUnitMapping("cm", CM_TO_MM);
         addUnitMapping("m", M_TO_MM);
         addUnitMapping("px", PX_TO_MM);
+        addUnitMapping("pt", PT_TO_MM);
     }
 }

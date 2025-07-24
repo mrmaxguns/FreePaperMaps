@@ -13,15 +13,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-
-import static io.github.mrmaxguns.freepapermaps.rendering.Scaler.asInteger;
 
 
 /** The MapRenderer renders a map using Apache Batik. */
@@ -64,22 +60,6 @@ public class MapRenderer {
         double width = screen.getWidth();
         double height = screen.getHeight();
 
-        // Attribution
-        if (attribution) {
-            Font attributionFont = new Font("Serif", Font.PLAIN, 5);
-            svgGenerator.setFont(attributionFont);
-            String attributionString = "Map data from OpenStreetMap";
-            FontRenderContext frc = svgGenerator.getFontRenderContext();
-            Rectangle2D boundsAttribution = attributionFont.getStringBounds(attributionString, frc);
-            LineMetrics attributionMetrics = attributionFont.getLineMetrics(attributionString, frc);
-
-            svgGenerator.setColor(Color.WHITE);
-            svgGenerator.fillRect(0, 0, asInteger(boundsAttribution.getWidth()),
-                                  asInteger(boundsAttribution.getHeight() + attributionMetrics.getDescent()));
-            svgGenerator.setColor(Color.BLACK);
-            svgGenerator.drawString(attributionString, 0, asInteger(boundsAttribution.getHeight()));
-        }
-
         // Adjust SVG properties so that units are scaled properly
         Element svgRoot = svgGenerator.getRoot(documentFactory.getDocumentElement());
 
@@ -98,6 +78,6 @@ public class MapRenderer {
 
     /** Renders a map to the g2d object, returning the dimensions of the map as a <code>Rectangle2D</code>. */
     public Rectangle2D renderToGraphics2D(Graphics2D g2d) throws UserInputException {
-        return style.compile(mapData, projection, scaler).render(g2d);
+        return style.compile(mapData, projection, scaler).render(g2d, attribution);
     }
 }

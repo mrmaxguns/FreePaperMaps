@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
+import static io.github.mrmaxguns.freepapermaps.rendering.Scaler.asInteger;
+
 
 public class StyleAttributeParser {
     private static final double RAD_TO_DEG = 57.295779513;
@@ -32,6 +34,8 @@ public class StyleAttributeParser {
     private final ArrayList<String> optionalCountProperties;
     private final ArrayList<String> requiredAngleProperties;
     private final ArrayList<String> optionalAngleProperties;
+    private final ArrayList<String> requiredFontSizeProperties;
+    private final ArrayList<String> optionalFontSizeProperties;
 
     private final UnitManager distanceUnitManager;
     private final UnitManager angleUnitManager;
@@ -52,6 +56,8 @@ public class StyleAttributeParser {
         optionalCountProperties = new ArrayList<>();
         requiredAngleProperties = new ArrayList<>();
         optionalAngleProperties = new ArrayList<>();
+        requiredFontSizeProperties = new ArrayList<>();
+        optionalFontSizeProperties = new ArrayList<>();
 
         distanceUnitManager = new DistanceUnitManager();
         angleUnitManager = new UnitManager();
@@ -115,6 +121,14 @@ public class StyleAttributeParser {
 
         for (String prop : optionalAngleProperties) {
             result.angleProperties.put(prop, parseAngle(xmlTools.getAttributeValue(el, prop, false)));
+        }
+
+        for (String prop : requiredFontSizeProperties) {
+            result.fontSizeProperties.put(prop, parseFontSize(xmlTools.getAttributeValue(el, prop)));
+        }
+
+        for (String prop : optionalFontSizeProperties) {
+            result.fontSizeProperties.put(prop, parseFontSize(xmlTools.getAttributeValue(el, prop, false)));
         }
 
         return result;
@@ -182,6 +196,16 @@ public class StyleAttributeParser {
             requiredAngleProperties.add(name);
         } else {
             optionalAngleProperties.add(name);
+        }
+        allProperties.add(name);
+    }
+
+    public void addFontSizeProperty(String name, boolean required) {
+        checkDuplicateProperty(name);
+        if (required) {
+            requiredFontSizeProperties.add(name);
+        } else {
+            optionalFontSizeProperties.add(name);
         }
         allProperties.add(name);
     }
@@ -290,6 +314,15 @@ public class StyleAttributeParser {
         return OptionalDouble.of(angleUnitManager.parseNumberWithUnit(rawAngle));
     }
 
+    public OptionalInt parseFontSize(String rawFontSize) throws UserInputException {
+        if (rawFontSize == null) {
+            return OptionalInt.empty();
+        }
+
+        final double MM_TO_PT = 1 / 0.3527777778;
+        return OptionalInt.of(asInteger(parseLength(rawFontSize).orElseThrow() * MM_TO_PT));
+    }
+
     public static class ParsedAttributes {
         public HashMap<String, String> stringProperties = new HashMap<>();
         public HashMap<String, Color> colorProperties = new HashMap<>();
@@ -297,5 +330,6 @@ public class StyleAttributeParser {
         public HashMap<String, OptionalDouble> lengthProperties = new HashMap<>();
         public HashMap<String, OptionalInt> countProperties = new HashMap<>();
         public HashMap<String, OptionalDouble> angleProperties = new HashMap<>();
+        public HashMap<String, OptionalInt> fontSizeProperties = new HashMap<>();
     }
 }
