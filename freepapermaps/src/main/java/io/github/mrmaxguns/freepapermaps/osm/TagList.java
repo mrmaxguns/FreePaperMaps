@@ -7,7 +7,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -54,39 +53,5 @@ public class TagList extends HashMap<String, String> {
                 put(xmlTools.getAttributeValue(tag, "k"), xmlTools.getAttributeValue(tag, "v"));
             }
         }
-    }
-
-    /**
-     * Whether this TagList is a subset of <code>other</code>.
-     * <p>
-     * This is a special type of subset that is useful for queries. There is a very particular treatment of ""/null values
-     * that allows ""/null to be used as a "wildcard". In other words, if this TagList contains a key with a ""/null value,
-     * it will count as a match even if the other TagList we're checking has a non-null value. The wildcard property
-     * does not work the other way around.
-     */
-    public boolean isQuerySubset(TagList other) {
-        if (this == other) {
-            return true;
-        }
-
-        for (Map.Entry<String, String> entry : entrySet()) {
-            if (!other.containsKey(entry.getKey())) {
-                return false;
-            }
-
-            String val = entry.getValue();
-            String otherVal = other.get(entry.getKey());
-            boolean valIsEmpty = val == null || val.isEmpty();
-            boolean otherValIsEmpty = otherVal == null || otherVal.isEmpty();
-
-            if (!valIsEmpty && otherValIsEmpty) {
-                return false;
-            } else if (!valIsEmpty) {
-                if (!val.equals(otherVal)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }

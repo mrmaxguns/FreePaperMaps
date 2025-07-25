@@ -1,7 +1,5 @@
 package io.github.mrmaxguns.freepapermaps.styling;
 
-import io.github.mrmaxguns.freepapermaps.osm.TagList;
-
 import java.util.Objects;
 
 
@@ -11,14 +9,13 @@ import java.util.Objects;
  * to specify whether the selector applies to Nodes or Ways.
  */
 public abstract class Selector<T> {
-    /** A list of tags that a geometry element must have to be considered "matching." */
-    private final TagList tags;
+    private final TagQuery query;
     /** A unique identifier for the selector, so that a layer can refer to it. Never <code>null</code>. */
     private String id;
 
-    public Selector(String id) {
+    public Selector(String id, TagQuery query) {
         this.id = Objects.requireNonNull(id);
-        this.tags = new TagList();
+        this.query = query;
     }
 
     /** Returns true whether the given geometry element matches this selector's requirements. */
@@ -32,7 +29,7 @@ public abstract class Selector<T> {
         this.id = Objects.requireNonNull(id);
     }
 
-    public TagList getTags() {
-        return tags;
+    public TagQuery getQuery() {
+        return query;
     }
 }

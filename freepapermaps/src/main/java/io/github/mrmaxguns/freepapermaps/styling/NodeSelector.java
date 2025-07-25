@@ -8,8 +8,8 @@ import org.w3c.dom.Element;
 
 /** A Selector for Nodes. */
 public class NodeSelector extends Selector<Node> {
-    public NodeSelector(String id) {
-        super(id);
+    public NodeSelector(String id, TagQuery query) {
+        super(id, query);
     }
 
     public static NodeSelector fromXML(Element rawSelector) throws UserInputException {
@@ -19,12 +19,11 @@ public class NodeSelector extends Selector<Node> {
     /** Constructs a NodeSelector from an XML Node. */
     public static NodeSelector fromXML(Element rawSelector, XMLTools xmlTools) throws UserInputException {
         String id = xmlTools.getAttributeValue(rawSelector, "id");
-        NodeSelector newNodeSelector = new NodeSelector(id);
-        newNodeSelector.getTags().insertFromXML(rawSelector.getChildNodes());
-        return newNodeSelector;
+        TagQuery query = TagQuery.fromXML(rawSelector, xmlTools);
+        return new NodeSelector(id, query);
     }
 
     public boolean matches(Node val) {
-        return getTags().isQuerySubset(val.getTags());
+        return getQuery().matches(val.getTags());
     }
 }

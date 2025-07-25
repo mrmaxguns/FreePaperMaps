@@ -8,8 +8,8 @@ import org.w3c.dom.Element;
 
 /** A Selector for Ways. */
 public class WaySelector extends Selector<Way> {
-    public WaySelector(String id) {
-        super(id);
+    public WaySelector(String id, TagQuery query) {
+        super(id, query);
     }
 
     public static WaySelector fromXML(Element rawSelector) throws UserInputException {
@@ -19,12 +19,11 @@ public class WaySelector extends Selector<Way> {
     /** Constructs a WaySelector from an XML Node. */
     public static WaySelector fromXML(Element rawSelector, XMLTools xmlTools) throws UserInputException {
         String id = xmlTools.getAttributeValue(rawSelector, "id");
-        WaySelector newWaySelector = new WaySelector(id);
-        newWaySelector.getTags().insertFromXML(rawSelector.getChildNodes());
-        return newWaySelector;
+        TagQuery query = TagQuery.fromXML(rawSelector, xmlTools);
+        return new WaySelector(id, query);
     }
 
     public boolean matches(Way val) {
-        return getTags().isQuerySubset(val.getTags());
+        return getQuery().matches(val.getTags());
     }
 }

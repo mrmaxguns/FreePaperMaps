@@ -126,7 +126,7 @@ public class MapStyle {
         MapStyle style = new MapStyle();
 
         // Draw all ways
-        WaySelector waySelector = new WaySelector("ways");
+        WaySelector waySelector = new WaySelector("ways", new TagQuery(new TagQuery.And()));
         style.addWaySelector(waySelector);
         style.addWayLayer(new PolylineLayer("ways", null, null, null));
 
