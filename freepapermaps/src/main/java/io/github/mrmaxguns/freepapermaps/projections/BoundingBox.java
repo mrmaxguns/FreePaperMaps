@@ -77,6 +77,7 @@ public class BoundingBox<C extends Coordinate<C>> {
                bottomRightCorner.equals(other.getBottomRightCorner(), epsilonX, epsilonY);
     }
 
+    @Override
     public String toString() {
         return "BoundingBox(topLeftCorner=" + topLeftCorner + ", bottomRightCorner=" + bottomRightCorner + ")";
     }
