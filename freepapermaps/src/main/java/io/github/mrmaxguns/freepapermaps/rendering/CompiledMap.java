@@ -40,7 +40,7 @@ public class CompiledMap {
         // geometry that extends beyond the boundaries is still rendered properly. Once we are done rendering, we should
         // hide any nodes outside the bounds that we used purely for maintaining correct geometry.
         BoundingBox<WGS84Coordinate> rawBounds =
-                mapData.getNodeBoundingBox() != null ? mapData.getBoundingBox() : mapData.getNodeBoundingBox();
+                mapData.getBoundingBox() != null ? mapData.getBoundingBox() : mapData.getNodeBoundingBox();
         BoundingBox<ScaledCoordinate> finalBounds = scaler.scale(projection.project(rawBounds));
         ScaledCoordinate finalOrigin = finalBounds.getTopLeftCorner();
         Rectangle2D clippingRect = new Rectangle2D.Double(finalOrigin.getX(), finalOrigin.getY(),

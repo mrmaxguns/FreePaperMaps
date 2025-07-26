@@ -151,7 +151,12 @@ public class App {
 
         // Create a scaler based on user options. The scaler is based on the final bounding box, since that is what's
         // returned to the user.
-        BoundingBox<ProjectedCoordinate> projectedBounds = projection.project(mapData.getBoundingBox());
+        BoundingBox<ProjectedCoordinate> projectedBounds;
+        if (mapData.getBoundingBox() != null) {
+            projectedBounds = projection.project(mapData.getBoundingBox());
+        } else {
+            projectedBounds = projection.project(mapData.getNodeBoundingBox());
+        }
         Scaler scaler = null;
         switch (scaleOption) {
             case Fixed -> scaler = new Scaler(scale);
