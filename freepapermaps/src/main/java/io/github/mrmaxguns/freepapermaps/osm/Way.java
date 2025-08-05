@@ -2,13 +2,12 @@ package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.XMLTools;
+import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 /** Represents an OSM way, which is an ordered list of node ids. */
@@ -19,6 +18,8 @@ public class Way {
     private boolean visible;
     /** An ordered list of Node IDs associated with this Way. */
     private final ArrayList<Long> nodeIds;
+    /** A mapping containing all inlined nodes (nodes whose positions were specified in the way itself). */
+    private final Map<Long, io.github.mrmaxguns.freepapermaps.osm.Node> inlineNodes;
     /** A collection of tags associated with this Way. */
     private final TagList tags;
 
@@ -26,6 +27,7 @@ public class Way {
     public Way(long id, boolean visible) {
         this.id = id;
         this.visible = visible;
+        this.inlineNodes = new HashMap<>();
         this.nodeIds = new ArrayList<>();
         this.tags = new TagList();
     }
@@ -62,7 +64,17 @@ public class Way {
             Element child = (Element) children.item(i);
             if (child.getTagName().equals("nd")) {
                 // Parse node references
-                newWay.addNodeId(xmlTools.getAttributeValueLong(child, "ref"));
+                long ref = xmlTools.getAttributeValueLong(child, "ref");
+                newWay.addNodeId(ref);
+
+                // Handle inline lon/lat, which is the format returned by Overpass Turbo.
+                OptionalDouble lon = xmlTools.getAttributeValueDouble(child, "lon", false);
+                OptionalDouble lat = xmlTools.getAttributeValueDouble(child, "lat", false);
+
+                if (lon.isPresent() && lat.isPresent()) {
+                    WGS84Coordinate position = new WGS84Coordinate(lon.getAsDouble(), lat.getAsDouble());
+                    newWay.inlineNodes.put(ref, new io.github.mrmaxguns.freepapermaps.osm.Node(ref, position, false));
+                }
             } else if (child.getTagName().equals("tag")) {
                 // Parse tags
                 newWay.getTags().put(
@@ -100,12 +112,24 @@ public class Way {
         nodeIds.add(id);
     }
 
-    /** Clears the list of <code>Node</code> ids. */
-    public void clearNodeIds() {
+    /** Clears the list of <code>Node</code> ids and list of inline nodes. */
+    public void clearNodes() {
         nodeIds.clear();
+        inlineNodes.clear();
     }
 
     public TagList getTags() {
         return tags;
+    }
+
+    public Map<Long, io.github.mrmaxguns.freepapermaps.osm.Node> getInlineNodes() {
+        return Collections.unmodifiableMap(inlineNodes);
+    }
+
+    public void addInlineNode(long id, io.github.mrmaxguns.freepapermaps.osm.Node node) {
+        if (!nodeIds.contains(id)) {
+            nodeIds.add(id);
+        }
+        inlineNodes.put(id, node);
     }
 }

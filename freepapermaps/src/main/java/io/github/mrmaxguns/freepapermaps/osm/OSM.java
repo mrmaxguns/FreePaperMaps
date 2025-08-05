@@ -105,7 +105,15 @@ public class OSM {
         NodeList rawWays = doc.getElementsByTagName("way");
         for (int i = 0; i < rawWays.getLength(); ++i) {
             if (rawWays.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-                newOSM.addWay(Way.fromXML((Element) rawWays.item(i)));
+                Way w = Way.fromXML((Element) rawWays.item(i));
+                newOSM.addWay(w);
+
+                // Insert any inline nodes that aren't present already.
+                for (Node n : w.getInlineNodes().values()) {
+                    if (newOSM.getNodeById(n.getId()) == null) {
+                        newOSM.addNode(n);
+                    }
+                }
             }
         }
 
