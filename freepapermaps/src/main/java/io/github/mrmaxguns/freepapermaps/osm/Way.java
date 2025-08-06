@@ -11,25 +11,17 @@ import java.util.*;
 
 
 /** Represents an OSM way, which is an ordered list of node ids. */
-public class Way {
-    /** The Way's unique identifier. */
-    private long id;
-    /** Whether the Way should be rendered. */
-    private boolean visible;
+public class Way extends OSMElement {
     /** An ordered list of Node IDs associated with this Way. */
     private final ArrayList<Long> nodeIds;
     /** A mapping containing all inlined nodes (nodes whose positions were specified in the way itself). */
     private final Map<Long, io.github.mrmaxguns.freepapermaps.osm.Node> inlineNodes;
-    /** A collection of tags associated with this Way. */
-    private final TagList tags;
 
     /** Constructs a Way. */
     public Way(long id, boolean visible) {
-        this.id = id;
-        this.visible = visible;
+        super(id, visible);
         this.inlineNodes = new HashMap<>();
         this.nodeIds = new ArrayList<>();
-        this.tags = new TagList();
     }
 
     /** Constructs a Way object from an org.w3c.dom XML Node. */
@@ -42,15 +34,8 @@ public class Way {
      * object.
      */
     public static Way fromXML(Element rawWay, XMLTools xmlTools) throws UserInputException {
-        long id = xmlTools.getAttributeValueLong(rawWay, "id");
-
-        // Get optional visibility attribute
-        boolean visible = true;
-        String visibleRaw = xmlTools.getAttributeValue(rawWay, "visible", false);
-        if (visibleRaw != null) {
-            visible = Boolean.parseBoolean(visibleRaw);
-        }
-
+        long id = getIdFromXML(rawWay, xmlTools);
+        boolean visible = getVisibleFromXML(rawWay, xmlTools);
         Way newWay = new Way(id, visible);
 
         // A way's children are usually both node references and tags. To speed up the process, we will collect both
@@ -86,22 +71,6 @@ public class Way {
         return newWay;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
     /** Returns an unmodifiable list of <code>Node</code> ids. */
     public List<Long> getNodeIds() {
         return Collections.unmodifiableList(nodeIds);
@@ -116,10 +85,6 @@ public class Way {
     public void clearNodes() {
         nodeIds.clear();
         inlineNodes.clear();
-    }
-
-    public TagList getTags() {
-        return tags;
     }
 
     public Map<Long, io.github.mrmaxguns.freepapermaps.osm.Node> getInlineNodes() {

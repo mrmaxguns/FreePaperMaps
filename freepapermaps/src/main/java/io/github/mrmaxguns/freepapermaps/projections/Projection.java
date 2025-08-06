@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * Examples of projections include Mercator and Lambert Conformal Conic.
  */
 public abstract class Projection {
-    /** The WGS84 Coordinate which will be taken to be the top left corner of the map. */
+    /** The WGS84 BaseCoordinate which will be taken to be the top left corner of the map. */
     protected final WGS84Coordinate origin;
 
     /** Constructs a Projection given a point of origin (WGS84). */
@@ -25,7 +25,7 @@ public abstract class Projection {
         return origin;
     }
 
-    /** Converts a WGS84 Coordinate to a Projected Coordinate based on the current projection. */
+    /** Converts a WGS84 BaseCoordinate to a Projected BaseCoordinate based on the current projection. */
     public abstract ProjectedCoordinate project(WGS84Coordinate original);
 
     /** Projects a WGS84 Bounding Box to a Projected Bounding Box. */

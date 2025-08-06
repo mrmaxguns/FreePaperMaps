@@ -33,9 +33,11 @@ import java.util.Objects;
  */
 public class OSM {
     /** A list of nodes, where keys are node ids for fast access. */
-    private final HashMap<Long, Node> nodes;
+    private final HashMap<Long, Node> nodes = new HashMap<>();
     /** A list of ways, where keys are way ids for fast access. */
-    private final HashMap<Long, Way> ways;
+    private final HashMap<Long, Way> ways = new HashMap<>();
+
+    private final HashMap<Long, Relation> relations = new HashMap<>();
     /** A bounding box defining the geographic area to be rendered. Can be null. */
     private BoundingBox<WGS84Coordinate> boundingBox;
     /**
@@ -61,8 +63,6 @@ public class OSM {
      */
     public OSM(BoundingBox<WGS84Coordinate> boundingBox) {
         this.boundingBox = boundingBox;
-        this.nodes = new HashMap<>();
-        this.ways = new HashMap<>();
         this.nodeBoundingBox = null;
     }
 
@@ -209,6 +209,34 @@ public class OSM {
         ways.clear();
     }
 
+    /** Returns a non-modifiable list of <code>Relation</code>s. */
+    public List<Relation> getRelations() {
+        return List.copyOf(relations.values());
+    }
+
+    /** Returns a <code>Relation</code> given an id, or null if it doesn't exist. */
+    public Relation getRelationById(long id) {
+        return relations.get(id);
+    }
+
+    /**
+     * Adds a new <code>Relation</code> to the list of <code>Relation</code>s. The <code>Relation</code> cannot be
+     * <code>null</code>.
+     */
+    public void addRelation(Relation newRelation) {
+        relations.put(newRelation.getId(), Objects.requireNonNull(newRelation));
+    }
+
+    /** Removes a <code>Relation</code> by id, or does nothing if it doesn't exist. */
+    public void removeRelationById(long id) {
+        relations.remove(id);
+    }
+
+    /** Clears the list of <code>Relation</code>s. */
+    public void clearRelations() {
+        relations.clear();
+    }
+
     public BoundingBox<WGS84Coordinate> getNodeBoundingBox() {
         return nodeBoundingBox;
     }
@@ -226,9 +254,7 @@ public class OSM {
      *
      * @return the list of <code>Nodes</code> or <code>null</code> if such a <code>Way</code> doesn't exist
      */
-    public List<Node> getNodesInWay(long wayId) throws UserInputException {
-        Way way = getWayById(wayId);
-
+    public List<Node> getNodesInWay(Way way) throws UserInputException {
         if (way == null) {
             return null;
         }
@@ -239,13 +265,42 @@ public class OSM {
 
             if (n == null) {
                 throw new UserInputException(
-                        "Way with id " + wayId + " references node with id " + nodeId + " that doesn't exist.");
+                        "Way with id " + way.getId() + " references node with id " + nodeId + " that doesn't exist.");
             }
 
             nodes.add(n);
         }
 
         return nodes;
+    }
+
+    public List<RelationMember> getRelationMembers(Relation relation) throws UserInputException {
+        if (relation == null) {
+            return null;
+        }
+
+
+        List<RelationMember> result = new ArrayList<>();
+        for (Relation.Member member : relation.getMembers()) {
+            OSMElement element;
+
+            switch (member.type()) {
+                case Node -> element = getNodeById(member.ref());
+                case Way -> element = getWayById(member.ref());
+                case Relation -> element = getRelationById(member.ref());
+                default -> throw new RuntimeException("Invalid control flow.");
+            }
+
+            if (element == null) {
+                // Do not panic about missing relation members, since this is a common occurrence in partially
+                // downloaded data.
+                continue;
+            }
+
+            result.add(new RelationMember(member.role(), element));
+        }
+
+        return result;
     }
 
     /**
@@ -288,4 +343,6 @@ public class OSM {
                                                 new WGS84Coordinate(maxLon, minLat));
         }
     }
+
+    public record RelationMember(String role, OSMElement element) {}
 }

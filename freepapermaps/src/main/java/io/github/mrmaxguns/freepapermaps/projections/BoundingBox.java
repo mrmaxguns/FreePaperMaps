@@ -1,10 +1,13 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
+
+
 /**
  * BoundingBox represents a box in space defined as the rectangular region between a top left point and a bottom right
  * point. BoundingBoxes are immutable, just like Coordinates.
  */
-public class BoundingBox<C extends Coordinate<C>> {
+public class BoundingBox<C extends BaseCoordinate<C>> {
     /** The top left corner (minimum x/lon, maximum y/lat). */
     private final C topLeftCorner;
     /** The bottom right corner (maximum x/lon, minimum y/lat). */

@@ -1,5 +1,6 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,17 +8,17 @@ import static org.junit.jupiter.api.Assertions.*;
 // TODO: Add @Overrides everywhere
 
 
-public class CoordinateTest {
+public class BaseCoordinateTest {
     @Test
     public void testConstructor() {
         double x = 9.1, y = 8.2;
         TestCoordinate coordinate = new TestCoordinate(x, y);
-        assertAll(() -> assertEquals(x, coordinate.getX(), 0.0001, "Coordinate constructor should initialize x"),
+        assertAll(() -> assertEquals(x, coordinate.getX(), 0.0001, "BaseCoordinate constructor should initialize x"),
                   () -> assertEquals(x, coordinate.getLon(), 0.0001,
-                                     "Coordinate constructor should initialize longitude"),
-                  () -> assertEquals(y, coordinate.getY(), 0.0001, "Coordinate constructor should initialize y"),
+                                     "BaseCoordinate constructor should initialize longitude"),
+                  () -> assertEquals(y, coordinate.getY(), 0.0001, "BaseCoordinate constructor should initialize y"),
                   () -> assertEquals(y, coordinate.getLat(), 0.0001,
-                                     "Coordinate constructor should initialize latitude"));
+                                     "BaseCoordinate constructor should initialize latitude"));
     }
 
     @Test
@@ -83,7 +84,7 @@ public class CoordinateTest {
     }
 
 
-    static class TestCoordinate extends Coordinate<TestCoordinate> {
+    static class TestCoordinate extends BaseCoordinate<TestCoordinate> {
         public TestCoordinate(double x, double y) {
             super(x, y);
         }

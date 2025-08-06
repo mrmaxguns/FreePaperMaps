@@ -1,10 +1,10 @@
 package io.github.mrmaxguns.freepapermaps.rendering;
 
-import io.github.mrmaxguns.freepapermaps.projections.Coordinate;
+import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
 
 
 /** An on-screen coordinate with units in millimeters, used in SVG output. */
-public class ScaledCoordinate extends Coordinate<ScaledCoordinate> {
+public class ScaledCoordinate extends BaseCoordinate<ScaledCoordinate> {
     public ScaledCoordinate(double x, double y) {
         super(x, y);
     }

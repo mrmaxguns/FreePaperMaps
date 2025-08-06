@@ -1,10 +1,13 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
+
+
 /**
  * Represents a coordinate that requires further processing. Since the meaning of this coordinate is ambiguous on
  * purpose, it should not be used in public interfaces.
  */
-public class RawCoordinate extends Coordinate<RawCoordinate> {
+public class RawCoordinate extends BaseCoordinate<RawCoordinate> {
     public RawCoordinate(double xOrLon, double yOrLat) {
         super(xOrLon, yOrLat);
     }

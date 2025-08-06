@@ -329,7 +329,7 @@ public class OSMTest {
 
     @Test
     public void testGetNodesInWay() throws UserInputException {
-        List<Node> nodes = validOSM.getNodesInWay(289801717);
+        List<Node> nodes = validOSM.getNodesInWay(validOSM.getWayById(289801717));
         assertAll(() -> assertEquals(8, nodes.size(),
                                      "the list returned by getNodesInWay should be equal in length to the num of " +
                                      "nodes"),
@@ -344,7 +344,7 @@ public class OSMTest {
 
     @Test
     public void testGetNodesInWayFakeWay() throws UserInputException {
-        assertNull(validOSM.getNodesInWay(8938393));
+        assertNull(validOSM.getNodesInWay(validOSM.getWayById(8938393)));
     }
 
     @Test
@@ -353,7 +353,7 @@ public class OSMTest {
         long wayId = 1259737750;
         long nodeId = 11711578120L;
         osm.removeNodeById(nodeId);
-        assertThrows(UserInputException.class, () -> osm.getNodesInWay(wayId),
+        assertThrows(UserInputException.class, () -> osm.getNodesInWay(validOSM.getWayById(wayId)),
                      "Attempting to get nodes in a way referencing a nonexistent node should throw an error");
     }
 }

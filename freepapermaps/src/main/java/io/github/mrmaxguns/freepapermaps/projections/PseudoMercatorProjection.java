@@ -1,7 +1,5 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
-import java.lang.Math;
-
 /**
  * The PseudoMercatorProjection is a Mercator projection that treats the Earth as a sphere. Unlike the Web Mercator,
  * this projection does not account for zoom level. This projection has significant distortions as we move away from
@@ -63,7 +61,7 @@ public class PseudoMercatorProjection extends Projection {
     }
 
     /**
-     * Projects a WGS84 Coordinate to our Projected Coordinate system with the help of the Mercator projection.
+     * Projects a WGS84 BaseCoordinate to our Projected BaseCoordinate system with the help of the Mercator projection.
      *
      * @param original the original WGS84 coordinate
      * @return an InternalMeters coordinate after applying a mercator projection to original
@@ -96,7 +94,8 @@ public class PseudoMercatorProjection extends Projection {
     /** Throws an exception if a point is not an appropriate input for this projection. */
     private void checkBounds(WGS84Coordinate c) {
         if (c.getLon() < MIN_LON || c.getLon() > MAX_LON || c.getLat() < MIN_LAT || c.getLat() > MAX_LAT) {
-            throw new IllegalArgumentException("Coordinate " + c + " is outside the bounds of what can be projected by the Mercator.");
+            throw new IllegalArgumentException(
+                    "BaseCoordinate " + c + " is outside the bounds of what can be projected by the Mercator.");
         }
     }
 }

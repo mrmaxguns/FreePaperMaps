@@ -52,7 +52,7 @@ public class PolylineLayer extends Layer<Way> {
 
     public CompiledGeometry compile(Way way, OSM mapData, Projection projection) throws UserInputException {
         CompiledPolyline polyline = new CompiledPolyline(this);
-        java.util.List<WGS84Coordinate> points = mapData.getNodesInWay(way.getId())
+        java.util.List<WGS84Coordinate> points = mapData.getNodesInWay(way)
                 .stream()
                 .map(Node::getPosition)
                 .toList();
