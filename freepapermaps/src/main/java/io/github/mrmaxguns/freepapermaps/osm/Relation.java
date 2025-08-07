@@ -73,8 +73,5 @@ public class Relation extends OSMElement {
 
     public record Member(Type type, long ref, String role) {
         enum Type {Node, Way, Relation}
-
-
-        ;
     }
 }

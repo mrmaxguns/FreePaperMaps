@@ -1,11 +1,15 @@
 package io.github.mrmaxguns.freepapermaps;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.osm.OSM;
-import io.github.mrmaxguns.freepapermaps.projections.*;
-import io.github.mrmaxguns.freepapermaps.rendering.DistanceUnitManager;
+import io.github.mrmaxguns.freepapermaps.projections.ProjectedCoordinate;
+import io.github.mrmaxguns.freepapermaps.projections.Projection;
+import io.github.mrmaxguns.freepapermaps.projections.PseudoMercatorProjection;
+import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
+import io.github.mrmaxguns.freepapermaps.styling.language.UnitManager;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
 import org.w3c.dom.Document;
@@ -91,7 +95,7 @@ public class App {
 
         double scale;
         ScaleOption scaleOption;
-        DistanceUnitManager distanceUnitManager = new DistanceUnitManager();
+        UnitManager distanceUnitManager = new UnitManager();
         if (cmd.hasOption("c")) {
             try {
                 scale = Double.parseDouble(cmd.getOptionValue("c"));

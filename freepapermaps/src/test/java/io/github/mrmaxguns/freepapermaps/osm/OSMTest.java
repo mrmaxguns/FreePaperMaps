@@ -1,7 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
-import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

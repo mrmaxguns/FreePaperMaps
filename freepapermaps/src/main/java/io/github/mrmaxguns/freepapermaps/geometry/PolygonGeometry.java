@@ -39,7 +39,12 @@ public class PolygonGeometry extends Geometry {
     }
 
     public static PolygonGeometry fromOSM(OSM osm, Way way) throws UserInputException {
-        WayGeometry exteriorRing = WayGeometry.fromOSM(osm, way);
+        return fromOSM(osm, way, new DummyProjection(), new Scaler(1));
+    }
+
+    public static PolygonGeometry fromOSM(OSM osm, Way way, Projection projection, Scaler scaler) throws
+            UserInputException {
+        WayGeometry exteriorRing = WayGeometry.fromOSM(osm, way, projection, scaler);
 
         if (exteriorRing.isClosed()) {
             return new PolygonGeometry(exteriorRing, new ArrayList<>());
@@ -239,6 +244,8 @@ public class PolygonGeometry extends Geometry {
         return false;
     }
 
+    // https://stackoverflow.com/questions/21217218/find-and-discard-shared-edges-between-polygons
+    // Assumption: polygons don't overlap
     private static void combineInnerHoles(List<WayGeometry> polygon) {
 
     }

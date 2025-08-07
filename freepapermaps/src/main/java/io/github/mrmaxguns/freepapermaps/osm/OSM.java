@@ -2,7 +2,7 @@ package io.github.mrmaxguns.freepapermaps.osm;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
 import io.github.mrmaxguns.freepapermaps.XMLTools;
-import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

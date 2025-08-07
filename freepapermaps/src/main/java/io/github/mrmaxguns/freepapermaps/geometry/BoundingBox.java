@@ -1,6 +1,4 @@
-package io.github.mrmaxguns.freepapermaps.projections;
-
-import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
+package io.github.mrmaxguns.freepapermaps.geometry;
 
 
 /**

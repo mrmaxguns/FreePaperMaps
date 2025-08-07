@@ -1,5 +1,8 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
+
+
 /**
  * The PseudoMercatorProjection is a Mercator projection that treats the Earth as a sphere. Unlike the Web Mercator,
  * this projection does not account for zoom level. This projection has significant distortions as we move away from

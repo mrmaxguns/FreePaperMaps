@@ -18,10 +18,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 
-/**
- * Represents a complete map style, independent of any data. A style can be <em>compiled</em> with other information to
- * produce a CompiledMap.
- */
 public class MapStyle {
     /** An ordered list of all selectors that apply to Nodes. */
     private final HashMap<String, NodeSelector> nodeSelectors;

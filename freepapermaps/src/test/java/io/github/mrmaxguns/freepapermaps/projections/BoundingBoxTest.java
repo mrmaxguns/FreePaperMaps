@@ -1,5 +1,6 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

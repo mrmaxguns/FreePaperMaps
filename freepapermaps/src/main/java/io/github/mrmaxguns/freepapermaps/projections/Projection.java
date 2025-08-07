@@ -1,5 +1,7 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

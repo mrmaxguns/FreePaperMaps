@@ -1,6 +1,6 @@
 package io.github.mrmaxguns.freepapermaps.rendering;
 
-import io.github.mrmaxguns.freepapermaps.projections.BoundingBox;
+import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
 import io.github.mrmaxguns.freepapermaps.projections.ProjectedCoordinate;
 
 public class Scaler {
@@ -29,6 +29,10 @@ public class Scaler {
 
     public static Scaler newScalerFromHeight(BoundingBox<ProjectedCoordinate> bounds, double heightInMillimeters) {
         return newScalerFromDistance(bounds.getHeight(), heightInMillimeters);
+    }
+
+    public double scale(double v) {
+        return v * scaleFactor;
     }
 
     public ScaledCoordinate scale(ProjectedCoordinate c) {
