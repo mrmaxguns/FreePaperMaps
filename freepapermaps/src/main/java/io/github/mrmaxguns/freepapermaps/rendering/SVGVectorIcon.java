@@ -1,7 +1,6 @@
-package io.github.mrmaxguns.freepapermaps.styling;
+package io.github.mrmaxguns.freepapermaps.rendering;
 
 import io.github.mrmaxguns.freepapermaps.UserInputException;
-import io.github.mrmaxguns.freepapermaps.rendering.ScaledCoordinate;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.bridge.*;
 import org.apache.batik.gvt.GraphicsNode;

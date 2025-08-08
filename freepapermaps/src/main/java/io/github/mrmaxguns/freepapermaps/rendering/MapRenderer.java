@@ -78,6 +78,6 @@ public class MapRenderer {
 
     /** Renders a map to the g2d object, returning the dimensions of the map as a <code>Rectangle2D</code>. */
     public Rectangle2D renderToGraphics2D(Graphics2D g2d) throws UserInputException {
-        return style.compile(mapData, projection, scaler).render(g2d, attribution);
+        return style.render(g2d, mapData, attribution);
     }
 }

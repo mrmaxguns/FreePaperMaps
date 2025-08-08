@@ -4,6 +4,7 @@ import io.github.mrmaxguns.freepapermaps.UserInputException;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -14,6 +15,10 @@ public class Interpreter {
 
     public Interpreter(Parser parser) throws UserInputException {
         this.ast = parser.parse();
+    }
+
+    public static Interpreter of(String data) throws UserInputException {
+        return new Interpreter(new Parser(new Lexer(data)));
     }
 
     private static double applyNumericBinaryOperation(Parser.BinaryOperatorNode ast, NumericPrimitive left,
@@ -243,7 +248,14 @@ public class Interpreter {
     public record Context(Map<String, Function<Context, Primitive>> recipes, Map<String, Primitive> globals,
                           Map<String, String> valueVariables,
                           Map<String, BiFunction<Context, java.util.List<Primitive>, Interpreter.Primitive>> functions,
-                          UnitManager unitManager) {}
+                          UnitManager unitManager) {
+        public Context extendWithValueVariables(Map<String, String> valueVariables) {
+            Map<String, String> newValueVariables = new HashMap<>();
+            newValueVariables.putAll(this.valueVariables);
+            newValueVariables.putAll(valueVariables);
+            return new Context(recipes, globals, newValueVariables, functions, unitManager);
+        }
+    }
 
 
     public static abstract class Primitive {
@@ -284,7 +296,7 @@ public class Interpreter {
 
 
     public static class ColorPrimitive extends Primitive {
-        Color value;
+        public final Color value;
 
         public ColorPrimitive(Color value) {
             super(Type.Color);
@@ -304,7 +316,7 @@ public class Interpreter {
 
 
     public static class StringPrimitive extends Primitive {
-        String value;
+        public final String value;
 
         public StringPrimitive(String value) {
             super(Type.String);

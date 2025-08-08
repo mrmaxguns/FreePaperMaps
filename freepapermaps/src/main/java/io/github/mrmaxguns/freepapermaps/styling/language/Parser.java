@@ -12,7 +12,7 @@ public class Parser {
 
     public Parser(Lexer lexer) throws UserInputException {
         this.lexer = lexer;
-        this.currentToken = lexer.getNextToken();
+        currentToken = lexer.getNextToken();
     }
 
     public AST parse() throws UserInputException {
@@ -63,12 +63,14 @@ public class Parser {
     private AST parsePrimaryExpression() throws UserInputException {
         switch (currentToken.type) {
             case HEX_COLOR_LITERAL -> {
+                AST result = new ColorNode(((Lexer.ColorToken) currentToken).value);
                 eat(Lexer.TokenType.HEX_COLOR_LITERAL);
-                return new ColorNode(((Lexer.ColorToken) currentToken).value);
+                return result;
             }
             case STRING_LITERAL -> {
+                AST result = new StringNode(((Lexer.StringToken) currentToken).value);
                 eat(Lexer.TokenType.STRING_LITERAL);
-                return new StringNode(((Lexer.StringToken) currentToken).value);
+                return result;
             }
             case GLOBAL_MARKER -> {
                 return parseGlobal();

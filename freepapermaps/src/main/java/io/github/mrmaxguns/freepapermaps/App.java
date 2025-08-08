@@ -9,6 +9,7 @@ import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import io.github.mrmaxguns.freepapermaps.rendering.MapRenderer;
 import io.github.mrmaxguns.freepapermaps.rendering.Scaler;
 import io.github.mrmaxguns.freepapermaps.styling.MapStyle;
+import io.github.mrmaxguns.freepapermaps.styling.language.Interpreter;
 import io.github.mrmaxguns.freepapermaps.styling.language.UnitManager;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.commons.cli.*;
@@ -19,6 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.HashMap;
 import java.util.Objects;
 
 
@@ -95,7 +97,7 @@ public class App {
 
         double scale;
         ScaleOption scaleOption;
-        UnitManager distanceUnitManager = new UnitManager();
+        //UnitManager distanceUnitManager = new UnitManager();
         if (cmd.hasOption("c")) {
             try {
                 scale = Double.parseDouble(cmd.getOptionValue("c"));
@@ -103,12 +105,12 @@ public class App {
                 throw new UserInputException("Map scale must be a number.");
             }
             scaleOption = ScaleOption.Fixed;
-        } else if (cmd.hasOption("W")) {
-            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("W"));
-            scaleOption = ScaleOption.Width;
-        } else if (cmd.hasOption("H")) {
-            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("H"));
-            scaleOption = ScaleOption.Height;
+//        } else if (cmd.hasOption("W")) {
+//            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("W"));
+//            scaleOption = ScaleOption.Width;
+//        } else if (cmd.hasOption("H")) {
+//            scale = distanceUnitManager.parseNumberWithUnit(cmd.getOptionValue("H"));
+//            scaleOption = ScaleOption.Height;
         } else {
             scale = 1;
             scaleOption = ScaleOption.Fixed;
@@ -140,13 +142,13 @@ public class App {
             throws ParserConfigurationException, UserInputException, SVGGraphics2DIOException  {
         // Gather necessary resources
         OSM mapData = OSM.fromXML(openXMLFile(Objects.requireNonNull(inputFileName)), new XMLTools(inputFileName));
-
-        MapStyle mapStyle;
-        if (styleFileName != null) {
-            mapStyle = MapStyle.fromXML(openXMLFile(styleFileName), new XMLTools(styleFileName));
-        } else {
-            mapStyle = MapStyle.debugMapStyle();
-        }
+//
+//        MapStyle mapStyle;
+//        if (styleFileName != null) {
+//            mapStyle = MapStyle.fromXML(openXMLFile(styleFileName), new XMLTools(styleFileName));
+//        } else {
+//            throw new RuntimeException(); //mapStyle = MapStyle.debugMapStyle();
+//        }
 
         // Create the projection so that the origin is the top-left-most point (even if the point is outside our final
         // bounding box).
@@ -167,6 +169,11 @@ public class App {
             case Width -> scaler = Scaler.newScalerFromWidth(projectedBounds, scale);
             case Height -> scaler = Scaler.newScalerFromHeight(projectedBounds, scale);
         }
+
+        MapStyle mapStyle = MapStyle.fromXML(openXMLFile(styleFileName), new XMLTools(styleFileName),
+                                             new Interpreter.Context(new HashMap<>(), new HashMap<>(), new HashMap<>(),
+                                                                     new HashMap<>(), new UnitManager(scaler)),
+                                             projection, scaler);
 
         // Render the map!
         MapRenderer renderer = new MapRenderer(mapData, mapStyle, projection, scaler, attribution);
