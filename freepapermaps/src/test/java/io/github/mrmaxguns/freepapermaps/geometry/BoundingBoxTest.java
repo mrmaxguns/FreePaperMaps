@@ -1,6 +1,7 @@
-package io.github.mrmaxguns.freepapermaps.projections;
+package io.github.mrmaxguns.freepapermaps.geometry;
 
-import io.github.mrmaxguns.freepapermaps.geometry.BoundingBox;
+import io.github.mrmaxguns.freepapermaps.projections.RawCoordinate;
+import io.github.mrmaxguns.freepapermaps.projections.WGS84Coordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,5 +90,13 @@ public class BoundingBoxTest {
         assertFalse(bbox2.equals(new BoundingBox<>(new RawCoordinate(1, 1), new RawCoordinate(150, 345)), 2, 0.1),
                     "when x, y epsilons are specified, bounding boxes not equal within the parameters are not " +
                     "considered equal");
+    }
+
+    @Test
+    public void testAlmostEquals() {
+        WGS84Coordinate a = new WGS84Coordinate(34.4, -11.5);
+        WGS84Coordinate b = new WGS84Coordinate(35.6, -12.0);
+        WGS84Coordinate c = new WGS84Coordinate(1e-13, -1e-15);
+        assertTrue(new BoundingBox<>(a, b).almostEquals(new BoundingBox<>(a.add(c), b.add(c))));
     }
 }

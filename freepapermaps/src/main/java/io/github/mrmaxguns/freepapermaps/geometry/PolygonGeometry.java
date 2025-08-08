@@ -15,6 +15,11 @@ import java.util.List;
 
 
 public class PolygonGeometry extends Geometry {
+    @Override
+    public boolean isCompletelyValid() {
+        return false;
+    }
+
     private static final String OUTER_ROLE = "outer";
     private static final String INNER_ROLE = "inner";
 

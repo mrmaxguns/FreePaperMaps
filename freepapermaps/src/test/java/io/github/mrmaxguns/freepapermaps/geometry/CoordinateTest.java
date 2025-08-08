@@ -1,24 +1,21 @@
-package io.github.mrmaxguns.freepapermaps.projections;
+package io.github.mrmaxguns.freepapermaps.geometry;
 
-import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Add @Overrides everywhere
 
-
-public class BaseCoordinateTest {
+public class CoordinateTest {
     @Test
     public void testConstructor() {
         double x = 9.1, y = 8.2;
         TestCoordinate coordinate = new TestCoordinate(x, y);
-        assertAll(() -> assertEquals(x, coordinate.getX(), 0.0001, "BaseCoordinate constructor should initialize x"),
+        assertAll(() -> assertEquals(x, coordinate.getX(), 0.0001, "Coordinate constructor should initialize x"),
                   () -> assertEquals(x, coordinate.getLon(), 0.0001,
-                                     "BaseCoordinate constructor should initialize longitude"),
-                  () -> assertEquals(y, coordinate.getY(), 0.0001, "BaseCoordinate constructor should initialize y"),
+                                     "Coordinate constructor should initialize longitude"),
+                  () -> assertEquals(y, coordinate.getY(), 0.0001, "Coordinate constructor should initialize y"),
                   () -> assertEquals(y, coordinate.getLat(), 0.0001,
-                                     "BaseCoordinate constructor should initialize latitude"));
+                                     "Coordinate constructor should initialize latitude"));
     }
 
     @Test
@@ -83,8 +80,17 @@ public class BaseCoordinateTest {
                     "equals(other, epsilonX, epsilonY) should use the respective epsilons as bounds");
     }
 
+    @Test
+    void testAlmostEqualsTrue() {
+        assertTrue(new TestCoordinate(0, 1e30).almostEquals(new TestCoordinate(1e-12, 1e30 - (1e-10))));
+    }
 
-    static class TestCoordinate extends BaseCoordinate<TestCoordinate> {
+    @Test
+    void testAlmostEqualsFalse() {
+        assertFalse(new TestCoordinate(4, 5).almostEquals(new TestCoordinate(4, 5.0001)));
+    }
+
+    static class TestCoordinate extends Coordinate<TestCoordinate> {
         public TestCoordinate(double x, double y) {
             super(x, y);
         }

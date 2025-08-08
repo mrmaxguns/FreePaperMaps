@@ -5,7 +5,7 @@ package io.github.mrmaxguns.freepapermaps.geometry;
  * BoundingBox represents a box in space defined as the rectangular region between a top left point and a bottom right
  * point. BoundingBoxes are immutable, just like Coordinates.
  */
-public class BoundingBox<C extends BaseCoordinate<C>> {
+public class BoundingBox<C extends Coordinate<?>> {
     /** The top left corner (minimum x/lon, maximum y/lat). */
     private final C topLeftCorner;
     /** The bottom right corner (maximum x/lon, minimum y/lat). */
@@ -56,8 +56,14 @@ public class BoundingBox<C extends BaseCoordinate<C>> {
 
     public double getMaxLat() { return getMaxY(); }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof BoundingBox<?>)) { return false; }
+        return equals((BoundingBox<?>) other);
+    }
+
     /** Returns true if the top left and bottom right coordinates of both bounding boxes are exactly equal. */
-    public boolean equals(BoundingBox<C> other) {
+    public boolean equals(BoundingBox<?> other) {
         return equals(other, 0.0);
     }
 
@@ -65,7 +71,7 @@ public class BoundingBox<C extends BaseCoordinate<C>> {
      * Returns true if the top left and bottom right coordinates of both bounding boxes are within (inclusive) of some
      * <code>epsilon</code>.
      */
-    public boolean equals(BoundingBox<C> other, double epsilon) {
+    public boolean equals(BoundingBox<?> other, double epsilon) {
         return equals(other, epsilon, epsilon);
     }
 
@@ -73,9 +79,15 @@ public class BoundingBox<C extends BaseCoordinate<C>> {
      * Returns true if the top left and bottom right coordinates of both bounding boxes are within (inclusive) of some
      * x and y epsilon.
      */
-    public boolean equals(BoundingBox<C> other, double epsilonX, double epsilonY) {
+    public boolean equals(BoundingBox<?> other, double epsilonX, double epsilonY) {
         return topLeftCorner.equals(other.getTopLeftCorner(), epsilonX, epsilonY) &&
                bottomRightCorner.equals(other.getBottomRightCorner(), epsilonX, epsilonY);
+    }
+
+    /** Returns true if both the top left and bottom right coordinates of both bounding boxes are almost equal. */
+    public boolean almostEquals(BoundingBox<?> other) {
+        return topLeftCorner.almostEquals(other.getTopLeftCorner()) &&
+               bottomRightCorner.almostEquals(other.getBottomRightCorner());
     }
 
     @Override

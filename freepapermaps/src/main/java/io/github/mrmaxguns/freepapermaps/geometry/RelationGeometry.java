@@ -6,6 +6,11 @@ import java.util.Map;
 
 
 public class RelationGeometry extends Geometry {
+    @Override
+    public boolean isCompletelyValid() {
+        return false;
+    }
+
     boolean resolved = false;
 
     public static RelationGeometry fromOSMUnresolved(Relation relation) {

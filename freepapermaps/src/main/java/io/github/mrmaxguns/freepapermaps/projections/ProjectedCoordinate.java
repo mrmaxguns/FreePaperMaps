@@ -1,6 +1,6 @@
 package io.github.mrmaxguns.freepapermaps.projections;
 
-import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
+import io.github.mrmaxguns.freepapermaps.geometry.Coordinate;
 
 
 /**
@@ -11,10 +11,10 @@ import io.github.mrmaxguns.freepapermaps.geometry.BaseCoordinate;
  *         Point values are x and y distances in meters. Distances are only positive and represent distance to
  *         the right (x) or down (y)
  *     </li>
- *     <li>A ProjectedCoordinate is typically the result of applying a Projection to a WGS84 BaseCoordinate</li>
+ *     <li>A ProjectedCoordinate is typically the result of applying a Projection to a WGS84 Coordinate</li>
  * </ul>
  */
-public class ProjectedCoordinate extends BaseCoordinate<ProjectedCoordinate> {
+public class ProjectedCoordinate extends Coordinate<ProjectedCoordinate> {
     public ProjectedCoordinate(double x, double y) {
         super(x, y);
     }
